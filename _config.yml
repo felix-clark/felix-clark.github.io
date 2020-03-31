@@ -26,11 +26,16 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://felix-clark.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username:  felix-clark
+linkedin_username: fm-clark
 
 # Build settings
 theme: minima
 plugins:
   - jekyll-feed
+
+# use kramdown
+# This seems to be the default, so specifying it may not be too important.
+markdown: kramdown
 
 # Exclude from processing.
 # The following items will not be processed, by default.
