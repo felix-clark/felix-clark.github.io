@@ -72,44 +72,63 @@ For a dataset of \\(N\\) observations \\(\\{(y^{(i)}, \mathbf{x}^{(i)}) | i \in 
 \ldots, N]\\}\\) the total log-likelihood function using a canonical-form
 exponential distribution for \\(y\\) is
 \\[l(\boldsymbol{\beta} | \mathbf{y}, \mathbf{X}) = \sum_{i=1}^N
-\boldsymbol{\eta}^{(i)}(\mathbf{x}^{(i)}\cdot\boldsymbol{\beta}) \cdot
-\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}^{(i)}(\mathbf{x}^{(i)} \cdot \boldsymbol{\beta}) \right)\\]
+\boldsymbol{\eta}(\mathbf{x}^{(i)}\cdot\boldsymbol{\beta}) \cdot
+\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(\mathbf{x}^{(i)} \cdot \boldsymbol{\beta}) \right)\\]
 where the \\(B(y)\\) terms have been excluded as they do not affect the dependency
 of the likelihood on \\(\boldsymbol{\beta}\\).
 
-The gradient with respect to \\(\boldsymbol{\beta}\\) is
+When multiple sufficient statistics are used \\(\mathbf{T}^\intercal(y) = [T^1
+(y), T^2(y), \ldots]\\) the natural approach is to make each
+natural parameter a function of a separate set of regression parameters
+\\(\eta^a = \eta^a(\mathbf{x}^\intercal \boldsymbol{\beta}^a)\\).
+The gradient with respect to \\(\boldsymbol{\beta}^a\\) is
 \begin{equation}
-\nabla_\beta l = \sum_{i=1}^N \mathbf{x}^{(i)} \left( \mathbf{T}(y^{(i)}) -
-\textrm{E}[\mathbf{T}(y^{(i)})|\boldsymbol{\eta}] \right) \cdot
-\boldsymbol{\eta}'
+\nabla_{\beta^a} l = \sum_{i=1}^N \mathbf{x}^{(i)} \left( T^a (y^{(i)}) -
+\textrm{E}[T^a (y^{(i)})|\boldsymbol{\eta}] \right) \eta^{a\prime}
 \end{equation}
-where the fact that \\(\nabla_\eta A(\boldsymbol{\eta}) = E[y]\\). With a canonical
-link function, \\(\eta = \mathbf{x}\cdot\boldsymbol{\beta}\\) and \\(\eta' = 1\\) (is
-this always true?).
+where the fact that \\(\nabla_\eta A(\boldsymbol{\eta}) = E[\mathbf{T}(y)]\\) is used.
+By definition, the canonical link function is the one that results from using
+\\(\eta = \mathbf{x}\cdot\boldsymbol{\beta}\\) which results in \\(\eta' = 1\\).
 
 The Hessian is given by
 \begin{equation}
-\nabla_\beta \nabla^\intercal_\beta l = \sum_{i=1}^N \mathbf{x}^{(i)}
-\mathbf{x}^{\intercal(i)} \left[ - \boldsymbol{\eta}' \cdot
-\textrm{Cov}[\mathbf{T}(y^{(i)})|\boldsymbol{\eta}] \cdot \boldsymbol{\eta}' +
-\left( \mathbf{T}(y^{(i)}) - \nabla_\eta A(\boldsymbol{\eta}) \right) \cdot
-\boldsymbol{\eta}'' \right]
+\nabla_{\beta^a} \nabla^\intercal_{\beta^b} l = \sum_{i=1}^N \mathbf{x}^{(i)}
+\mathbf{x}^{\intercal(i)} \left\\{ - \eta^{a \prime}
+\textrm{Cov}\left[T^{ab}(y^{(i)}) \middle| \boldsymbol{\eta}\right] \eta^{b \prime} +
+\delta_{ab} \eta^{a\prime\prime}\left( T^b (y^{(i)}) -
+\textrm{E}\left[T^b(y^{(i)}) \middle| \boldsymbol{\eta} \right] \right) \right\\}
 \end{equation}
-where it should be noted that the term in the brackets is a scalar for each
-individual sample \\(i\\).
+where \\(\delta_{ab}\\) is the Kronecker delta and there is no implicit
+summation over indices \\(a, b\\) in the term in the curly brackets.
 
-For many applications the natural exponential form can be used so the sufficient
-statistic is simply a scalar value of the response variable \\(\mathbf{T}(y) = y\\)
-and the canonical link function is used so that \\(\eta = \mathbf{x} \cdot
-\boldsymbol{\beta}\\) and \\(g(\textrm{E}[y]) = \eta\\). The above equations simplify
-and can be expressed easily in matrix form to include the sum over observations.
+Often the sufficient statistic is just the response variable itself
+\\(\mathbf{T}(y) = y\\). This allows for some simplification of the above
+equations for the log-likelihood and its derivatives, while still allowing for a
+general link function.
 \begin{align}
+l(\boldsymbol{\beta} | \mathbf{y}, \mathbf{X}) &= \sum_{i=1}^N
+\eta(\mathbf{x}^{\intercal(i)} \boldsymbol{\beta}) y^{(i)} -
+A\left(\eta(\mathbf{x}^{\intercal(i)} \boldsymbol{\beta}) \right) \\\\\
+\nabla_{\beta} l &= \sum_{i=1}^N \mathbf{x}^{(i)} \eta^{\prime} \left( y^{(i)} -
+\textrm{E}[y^{(i)}|\eta] \right)\\\\\
+\nabla_{\beta} \nabla^\intercal_{\beta} l &= \sum_{i=1}^N \mathbf{x}^{(i)}
+\mathbf{x}^{\intercal(i)} \left\\{ - (\eta^{\prime})^2 \textrm{Var}\left[y^{(i)}
+\middle| \eta\right] + \eta^{\prime\prime}\left( y^{(i)} -
+\textrm{E}\left[y^{(i)} \middle| \eta \right] \right) \right\\}
+\end{align}
+
+If in addition the canonical link function is used, \\(\eta = \mathbf{x} \cdot
+\boldsymbol{\beta}\\) and \\(g(\textrm{E}[y]) = \eta\\). The above equations
+simplify further and can be expressed easily in matrix form to include the sum
+over observations,
+\begin{align}
+l &= \mathbf{y}^\intercal \mathbf{X} \boldsymbol{\beta} - \sum_{i=1}^N
+A\left(\mathbf{x}^{\intercal(i)} \boldsymbol{\beta}\right) \\\\\
 \nabla_\beta l &= \mathbf{X}^\intercal \left[ \mathbf{y} - g^{-1}(\mathbf{X}\boldsymbol{\beta})\right] \\\\\
 \nabla_\beta \nabla_\beta^\intercal l &= - \mathbf{X}^\intercal \mathbf{S} \mathbf{X} \\
 \end{align}
-In the above expressions, the inverse link function \\(g^{-1}\\) is applied
-element-wise and the variance matrix is diagonal with \\(S_{ii} =
-\textrm{Var}[y^{(i)}|\mathbf{x}^{(i)} \cdot \boldsymbol{\beta}]\\).
+where the inverse link function \\(g^{-1}\\) is applied element-wise and the
+variance matrix is diagonal with \\(S_{ii} = \textrm{Var}[y^{(i)}|\eta]\\).
 
 ---
 ## Dispersion parameter
@@ -135,6 +154,8 @@ natural parameter \\(\eta\\) is called the _variance function_ \\(V(\mu)\\) when
 it can be written as a function of the predicted mean of the response \\(\mu =
 g^{-1}(\mathbf{x}\cdot\boldsymbol{\beta})\\).
 \\[ V(\mu) = \left. \frac{\partial^2 A(\eta)}{\partial \eta^2} \right|_{\eta = \eta(g(\mu))} \\]
+Expressing the variance as a function of the mean is useful because it is immune
+to changing the link function.
 The variance function, like the dispersion parameter, is unique only up to a
 constant due to the following relationship.
 \\[ \textrm{Var}[y] = \phi V(\mu) \\]
@@ -197,12 +218,12 @@ A Hermitian-solve algorithm can be applied to generate successive steps for
 \\(\boldsymbol{\beta}\\) until a desired tolerance is reached.
 
 ---
-## TODO Case studies
+## Case studies
 
-### Ordinary least squares (Gaussian)
+### Linear (Gaussian)
 
 The probability distribution function (PDF) of a normally-distributed variable
-with the standard parameterization variable is
+with the standard parameterization is
 \\[ f(y; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(y - \mu)^2}{2\sigma^2}} \\]
 or equivalently:
 \begin{align}
@@ -217,12 +238,14 @@ term in \\(y\\), taking the dispersion parameter \\(\phi = \sigma^2\\) so that
 The canonical link function is the identity because if \\(\eta =
 \mathbf{x}^\intercal\boldsymbol{\beta}\\) we clearly have \\(\mu =
 \mathbf{x}^\intercal \boldsymbol{\beta}\\).
+The variance function is \\(V(\mu) = 1\\).
 
 Even with variable weights, the log-likelihood function is simple.
 \\[ \log l = -\frac{1}{2} (\mathbf{y} - \mathbf{X}^\intercal
 \boldsymbol{\beta})^\intercal \mathbf{W} (\mathbf{y} - \mathbf{X}^\intercal
 \boldsymbol{\beta}) \\]
-This form shows the equivalence to ordinary least squares (OLS).
+This form shows the equivalence to weighted least squares (WLS), or ordinary
+least squares (OLS) when the weights are identical for each point.
 The correlated case is easily included by letting \\(\mathbf{W}\\) be the
 inverse covariance matrix of the observed \\(y^{(i)}\\). The
 \\(\boldsymbol{\beta}\\) that maximizes the likelihood can be found
@@ -240,7 +263,10 @@ natural parameters \\(\boldsymbol{\eta}^\intercal = \left[ \frac{\mu}{\sigma^2},
 -\frac{\eta_1^2}{4\eta_2} - \frac{1}{2}\log (-\eta_2) \\). This is likely a good
 application for a non-canonical link function for \\(\eta_2\\), for instance
 \\(\eta_2 = - \exp(\mathbf{x}\cdot\boldsymbol{\beta}_2)\\), since \\(\sigma^2 >
-0\\) so \\(\eta_2 < 0\\).
+0\\) so \\(\eta_2 < 0\\). Here the variance function \\(V(\mu)\\) could possibly
+be replaced by a covariance function of the two-component expected values of
+\\(\mu\\) and \\(\sigma^2\\), but checking this should require some more careful
+analysis. 
 
 [^ols-mean-var]:
     Check that the mean and variance of \\(y\\) are \\(\mu\\) and
@@ -259,26 +285,102 @@ or equivalently
 \end{align}
 where \\(y\\) takes a value of either 0 or 1.
 The natural parameter is \\(\eta = \log\left(\frac{p}{1-p}\right) =
-\textrm{logit}(p) \\) and as \\(p\\) is the mean of the Bernoulli distribution
-the logit function is also the canonical link function.
+\textrm{logit}(p) \\) and as \\(p = \mu\\) is the mean of the Bernoulli
+distribution the logit function is also the canonical link function.
+In terms of the natural parameter the log-partition function is \\(A(\eta) =
+\log\left(1 + e^\eta \right)\\).
+With the simple convention of \\(\phi=1\\), the variance function is \\(V(\mu) =
+\mu(1-\mu)\\).
 
-TODO: complete
 
 ### Poisson
 
-### Laplace (does this fit?)
+The Poisson distribution for non-negative integer \\(y\\) is
+\\[ f(y; \lambda) = \frac{\lambda^y e^{-\lambda}}{y!} \\]
+or equivalently
+\\[ \log f(y; \lambda) = y \log \lambda - \lambda - \log(y!) \\]
+The mean and variance are both equal to \\(\lambda\\), so the natural parameter
+is \\(\eta = \log \lambda\\) and the canonical link function is \\(g(\mu) = \log
+\mu \\).
+The log-partition is \\(A(\eta) = e^\eta \\) and \\(B(y) = -\log(y!)\\).
+The dispersion parameter is taken to be \\(\phi = 1\\) and the variance function
+is \\(V(\mu) = \mu\\).
+
 
 ### Exponential
+
+While exponentially-distributed error terms are not common, this distribution is
+still a useful case study because the distribution itself is mathematically
+simple but the constraint on the distribution's parameter motivates a
+non-canonical link function.
+The PDF for an exponentially-distributed positive real value \\(y\\) is
 \\[ f(y; \lambda) = \begin{cases}
 \lambda e^{-\lambda y} & \textrm{for } y \geq 0 \\\\\
 0 & \textrm{for } y < 0
 \end{cases}\\]
-The exponential distribution is a special case of the gamma distribution with
-\\(\alpha = 1\\).
+with \\(\lambda > 0\\) and the log-PDF is
+\\[ \log f(y; \lambda) = -\lambda y + \log \lambda \\]
+where \\(y \geq 0\\). The natural parameter is \\(\eta = -\lambda\\) and the
+log-partition function is \\(A(\eta) = - \log(-\eta)\\).
+Since the mean of the distribution is \\(\mu = -\frac{1}{\eta} =
+\frac{1}{\lambda}\\), the canonical link function is the negative inverse
+\\(g_0(\mu) = -\frac{1}{\mu}\\).
+The variance is \\(\textrm{Var}(y|\eta) = \frac{1}{\eta^2} \\) or
+\\(\textrm{Var}(y|\lambda) = \frac{1}{\lambda^2} \\) so with the simple choice
+of dispersion parameter \\(\phi = 1\\) the variance function is \\(V(\mu) =
+\mu^2\\).
 
-NOTE: This might be the best case to first investigate non-canonical link functions.
+The canonical link function \\(-\frac{1}{\mu} = \mathbf{x}^\intercal
+\boldsymbol{\beta}\\) does not prohibit values of \\(\mu < 0\\). The extent to
+which this is problematic will depend on the data points themselves, but we will
+show how to work around this as an example.
 
-### Binomial with known \\(n\\)
+Consider the parameterization \\(\eta = -\exp(-\theta)\\) where \\(
+\theta = \mathbf{x}^\intercal \boldsymbol{\beta}\\).
+The mean and variance are \\(e^{\theta}\\) and \\(e^{2\theta}\\), respectively,
+so the implied link function is logarithmic \\(g(\mu) = \log \mu =
+\mathbf{x}^\intercal \boldsymbol{\beta} \\).
+It is instructive to write out the likelihood and its first and second
+derivatives in this parameterization[^exp-log-link-like].
+\begin{align}
+l &= \sum_{i=1}^N \left[ - \exp\left(-\theta^{(i)}\right) y^{(i)} - \theta^{(i)} \right]\\\\\
+\nabla_{\beta} l &= \sum_{i=1}^N \mathbf{x}^{(i)} \left[ \exp\left(-\theta^{(i)}\right) y^{(i)} - 1 \right] \\\\\
+\nabla_{\beta} \nabla^\intercal_{\beta} l &= - \sum_{i=1}^N \mathbf{x}^{(i)}
+\mathbf{x}^{\intercal(i)} \exp\left(-\theta^{(i)}\right) y^{(i)}
+\end{align}
+
+[^exp-log-link-like]:
+    Verify that the expression holds both by direct derivation and by applying
+    the equations for the derivatives as a function of \\(\eta\\) and its derivatives.
+
+Note that the exponential distribution is a special case of the gamma
+distribution with \\(\alpha = 1\\). In practice using a gamma GLM may often be a
+better choice, but a similar issue arises with negative values so non-canonical
+link functions are often used there as well.
+
+
+### Binomial (fixed \\(n\\))
+
+The binomial distribution describes a variable \\(y\\) that can take values in a
+finite range from \\(0\\) to \\(n\\) inclusive. It is in the exponential family
+for a fixed \\(n\\), which is usually an obvious constraint based on the maximum
+logically possible value for \\(y\\). The PDF is
+\\[ f(y; n, p) =
+\binom{n}{y} p^y (1-p)^{n-y}
+\\]
+or
+\begin{align}
+\log f(y; n, p) &= y \log p + (n-y) \log(1-p) + \log n! - \log y! - \log[(n-y)!] \\\\\
+&= y \log \left( \frac{p}{1-p} \right) + n \log(1-p) + B(y, n)
+\end{align}
+and up to factors of \\(n\\) the analysis is similar to the logistic (Bernoulli)
+case.
+The natural parameter is \\(\eta = \textrm{logit}(p)\\), the log-partition
+function is \\(A(\eta) = n \log(1 + e^\eta)\\), the mean is \\(\mu = np\\), and
+the variance is \\(np(1-p)\\). With dispersion parameter \\(\phi = 1\\), the
+variance function is \\(V(\mu) = \mu\left(1 - \frac{\mu}{n}\right)\\).
+By writing \\(\eta\\) in terms of \\(\mu\\) it is seen that the canonical link
+function is \\(g(\mu) = \log\left( \frac{\mu}{n - \mu}\right) \\).
 
 ### Gamma
 The gamma distribution has two parameters, but it turns out that the shape
@@ -289,13 +391,58 @@ for the \\(\beta\\) parameter to be predicted by
 This seems analogous to the situations in OLS where the variance \\(\sigma^2\\)
 is the same for each data point so the minimization is unaffected by its value.
 
-### Negative binomial
+The PDF of the gamma distribution with the \\(\alpha, \beta\\) parameterization
+is
+\\[ f(y; \alpha, \beta) = \frac{\beta^\alpha y^{\alpha-1} e^{-\beta y}}{\Gamma(\alpha)} \\]
+or equivalently
+\\[
+\log f(y; \alpha, \beta) = -\beta y + (\alpha-1) \log y + \alpha \log \beta -
+\log \Gamma(\alpha)
+\\]
+where it is clear that the sufficient statistics should include at least one of
+\\([y, \log y]\\) with corresponding natural parameters \\([-\beta,
+\alpha-1]\\).
+
+We will start the analysis a bit differently than the other distributions we've
+looked at so far, in order to try to get to the simplest version as quickly as
+possible.
+The mean and variance of the gamma distribution are known to be
+\\(\alpha/\beta\\) and \\(\alpha/\beta^2\\), respectively.
+The variance could thus be written as either[^gamma-var] \\(\textrm{Var}[y] =
+\frac{1}{\beta}\mu = \frac{1}{\alpha}\mu^2\\) with dispersion factor \\(\phi\\)
+being the reciprocal of either \\(\beta\\) or \\(\alpha\\), respectively.
+It turns out that the second choice, with \\(\phi = \frac{1}{\alpha}\\) and
+\\(V(\mu) = \mu^2\\), is the most straightforward.
+\\[ \log f(y; \mu, \phi) = \frac{-\frac{1}{\mu} y - \log \mu}{\phi} + B(y, \phi)
+\\]
+In fact, other than the \\(B(y, \phi)\\) term this looks just like the case of
+the exponential distribution with \\(\lambda = 1/\mu\\), but with a non-unity
+dispersion parameter that does not affect the regression itself.
+
+[^gamma-var]:
+    Actually by this logic the variance function could be any power of \\(\mu\\)
+    with the right powers of \\(\alpha\\) and \\(\beta\\) as the dispersion
+    factor, but for simplicity we'll focus on the options that allow \\(\phi\\)
+    to be written only as a function of one or the other.
+    
+### TODO Negative binomial
 
 #### Known \\(r\\)
 
 #### Unknown \\(r\\)
 
-### Inverse Gaussian
+### TODO Inverse Gaussian
+
+### Others
+Many other distributions are in the exponential family and should be amenable in
+principle to a GLM model.
+* Chi-squared
+* Inverse gamma
+* Beta
+* Categorical
+* Multinomial
+* Dirichlet
+* Normal-gamma
 
 ---
 ## TODO Summary of GLMs for exponential familes
@@ -319,6 +466,11 @@ penalizing large values of the parameters in the likelihood function.
 ---
 ## TODO Goodness of fit
 Compare log-likelihoods of fit model to saturated model
+
+---
+## TODO Estimating the real dispersion parameter
+
+See the latter parts of [these notes](http://people.stat.sfu.ca/~raltman/stat402/402L25.pdf).
 
 ---
 ## TODO Numerical considerations
