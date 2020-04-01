@@ -4,20 +4,23 @@ layout: default
 <!-- <!DOCTYPE html> -->
 <html>
   {% include mathjax.html %}
+  <h1>
+    {{ page.title }}
+  </h1>
   <body>
     <nav class="single-post-nav">
       <ul>
+        {% if page.previous %}
         <li>
-          {% if page.previous %}
           <a href="{{ page.previous.url }}">&#8592; Previous post</a>
-          {% endif %}
         </li>
+        {% endif %}
         <li><a href="{{ site.baseurl }}/">Posts list</a></li>
+        {% if page.next %}
         <li>
-          {% if page.next %}
           <a href="{{ page.next.url }}">Next post &#8594;</a>
-          {% endif %}
         </li>
+        {% endif %}
       </ul>
     </nav>
     <div class="single-post">
