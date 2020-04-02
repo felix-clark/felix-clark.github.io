@@ -20,7 +20,9 @@ variables \\(x_k\\).
 The definition \\(x_0 \equiv 1\\) is used so that with \\(\mathbf{x}^\intercal \equiv [1, x_1,
 \ldots, x_K]\\) and \\(\boldsymbol{\beta}^\intercal \equiv [\beta_0, \beta_1, \ldots
 \beta_K]\\) the above equation is written as the following.
-\\[ g(E[y]) \sim \mathbf{x} \cdot \boldsymbol{\beta}\\]
+\\[ g(E[y]) = \mathbf{x}^\intercal \boldsymbol{\beta}\\]
+The _linear predictor_ is defined as \\(\omega = \mathbf{x}^\intercal
+\boldsymbol{\beta} \\).
 
 For \\(N\\) observations the response variables can be expressed as a vector
 \\(\mathbf{y}^\intercal \equiv [y^{(1)}, \ldots, y^{(N)}]\\) and the data matrix is
@@ -72,8 +74,8 @@ For a dataset of \\(N\\) observations \\(\\{(y^{(i)}, \mathbf{x}^{(i)}) | i \in 
 \ldots, N]\\}\\) the total log-likelihood function using a canonical-form
 exponential distribution for \\(y\\) is
 \\[l(\boldsymbol{\beta} | \mathbf{y}, \mathbf{X}) = \sum_{i=1}^N
-\boldsymbol{\eta}(\mathbf{x}^{(i)}\cdot\boldsymbol{\beta}) \cdot
-\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(\mathbf{x}^{(i)} \cdot \boldsymbol{\beta}) \right)\\]
+\boldsymbol{\eta}(\omega^{(i)}) \cdot
+\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(\omega^{(i)}) \right)\\]
 where the \\(B(y)\\) terms have been excluded as they do not affect the dependency
 of the likelihood on \\(\boldsymbol{\beta}\\).
 
@@ -123,7 +125,7 @@ simplify further and can be expressed easily in matrix form to include the sum
 over observations,
 \begin{align}
 l &= \mathbf{y}^\intercal \mathbf{X} \boldsymbol{\beta} - \sum_{i=1}^N
-A\left(\mathbf{x}^{\intercal(i)} \boldsymbol{\beta}\right) \\\\\
+A\left(\omega^{(i)} \right) \\\\\
 \nabla_\beta l &= \mathbf{X}^\intercal \left[ \mathbf{y} - g^{-1}(\mathbf{X}\boldsymbol{\beta})\right] \\\\\
 \nabla_\beta \nabla_\beta^\intercal l &= - \mathbf{X}^\intercal \mathbf{S} \mathbf{X} \\
 \end{align}
@@ -178,6 +180,55 @@ reminiscent of the inverse covariance matrix, at least in the multivariate
 normal distribution. Some additional work should be done to derive a consistent
 approach for a general response function, but for now I note that the Hessian
 still appears symmetric so long as \\(\mathbf{W}\\) is.
+
+---
+## Methods for computing the link and variance functions
+
+In the standard description the link function generally relates the expected
+value of the response variable to the linear predictor.
+\\[ g(\textrm{E}[y|\omega]) = \omega \\]
+Once the link function is known, its inverse can be used to quickly get the
+expected value given the linear predictor.
+\\[ \textrm{E}[y|\omega] = g^{-1}(\omega) \\]
+The expected response value, or mean \\(\mu\\), is known either from knowledge
+of the standard parameters \\(\boldsymbol{\theta}\\) or, assuming a single
+sufficient statistic \\(y\\), through the first derivative of the log-partition
+function as a function of the natural parameter \\(\eta\\).
+\\[ \mu = \frac{\partial A(\eta)}{\partial \eta} \\]
+This expression can be inverted to get the natural parameter as a function of the
+mean \\(\eta(\mu)\\).
+To use the canonical link function, the natural parameter is equal to the linear
+predictor so that \\( \eta_0(\omega) = \omega \\).
+A different parameterization can be used for \\(\eta\\), which implies a change
+in the link function.
+Let the natural parameter be defined through an invertible transformation
+\\(s\\) on the linear predictor.
+\\[ \eta(\omega) = s(\omega) \\]
+Given this transformation and the expression for \\(\eta\\) in terms of
+\\(\mu\\), the effect of this transformation on the link function is given by
+the following equation.
+\\[ g(\mu) = s^{-1}\left( \eta(\mu) \right) \\]
+The same function \\(\eta(\mu)\\) can be used to compute the variance function
+\\(V(\mu)\\).
+\\[ V(\mu) = \left. \frac{\partial^2 A(\eta)}{\partial \eta^2} \right|_{\eta = \eta(\mu)} \\]
+Note that it is unaffected by any transformation \\(s\\).
+In fact, by the [inverse function
+theorem](https://en.wikipedia.org/wiki/Inverse_function_theorem), if
+\\(\eta(\mu) = t(\mu)\\), then the variance function is the reciprocal of the
+derivative of \\(t\\).
+\\[ V(\mu) = \left( \frac{\partial t}{\partial \mu} \right)^{-1} \\]
+
+If there are multiple sufficient statistics, these statements should all be
+generalizable in the obvious way.
+Instead of a parameter \\(\mu\\) we have a vector of expectation values, and the
+generalized link function maps these multiple values to the set of linear
+predictors, which have the same cardinality.
+The multiple natural parameters can still be expressed as functions of these
+expected values.
+The variance function is now a symmetric matrix but there typically should be
+nothing stopping it from being expressible in terms of the expected values of
+the sufficient statistics; indeed, the multivariate version of the inverse
+function theorem should still apply.
 
 ---
 ## Iteratively re-weighted least squares
@@ -335,18 +386,18 @@ The canonical link function \\(-\frac{1}{\mu} = \mathbf{x}^\intercal
 which this is problematic will depend on the data points themselves, but we will
 show how to work around this as an example.
 
-Consider the parameterization \\(\eta = -\exp(-\theta)\\) where \\(
-\theta = \mathbf{x}^\intercal \boldsymbol{\beta}\\).
-The mean and variance are \\(e^{\theta}\\) and \\(e^{2\theta}\\), respectively,
+Consider the parameterization \\(\eta = -\exp(-\omega)\\) where \\(
+\omega = \mathbf{x}^\intercal \boldsymbol{\beta}\\).
+The mean and variance are \\(e^{\omega}\\) and \\(e^{2\omega}\\), respectively,
 so the implied link function is logarithmic \\(g(\mu) = \log \mu =
 \mathbf{x}^\intercal \boldsymbol{\beta} \\).
 It is instructive to write out the likelihood and its first and second
 derivatives in this parameterization[^exp-log-link-like].
 \begin{align}
-l &= \sum_{i=1}^N \left[ - \exp\left(-\theta^{(i)}\right) y^{(i)} - \theta^{(i)} \right]\\\\\
-\nabla_{\beta} l &= \sum_{i=1}^N \mathbf{x}^{(i)} \left[ \exp\left(-\theta^{(i)}\right) y^{(i)} - 1 \right] \\\\\
+l &= \sum_{i=1}^N \left[ - \exp\left(-\omega^{(i)}\right) y^{(i)} - \omega^{(i)} \right]\\\\\
+\nabla_{\beta} l &= \sum_{i=1}^N \mathbf{x}^{(i)} \left[ \exp\left(-\omega^{(i)}\right) y^{(i)} - 1 \right] \\\\\
 \nabla_{\beta} \nabla^\intercal_{\beta} l &= - \sum_{i=1}^N \mathbf{x}^{(i)}
-\mathbf{x}^{\intercal(i)} \exp\left(-\theta^{(i)}\right) y^{(i)}
+\mathbf{x}^{\intercal(i)} \exp\left(-\omega^{(i)}\right) y^{(i)}
 \end{align}
 
 [^exp-log-link-like]:
@@ -425,13 +476,64 @@ dispersion parameter that does not affect the regression itself.
     factor, but for simplicity we'll focus on the options that allow \\(\phi\\)
     to be written only as a function of one or the other.
     
-### TODO Negative binomial
+### Negative binomial (fixed \\(r\\))
 
-#### Known \\(r\\)
+The negative binomial distribution is an over-dispersed Poisson distribution, in
+that its support is over the non-negative integers but its variance is greater
+than its mean.
+\begin{align}
+f(y; r, p) &= \frac{p^r (1-p)^y}{ y B(r, y)} \\\\\
+\log f(y; r, p) &= y \log(1-p) + r \log p - \log y - \log \textrm{Beta}(r, y)
+\end{align}
 
-#### Unknown \\(r\\)
+Like the binomial distribution, the negative binomial distribution is in the
+exponential family if and only if one of its standard parameters (\\(r\\)) is
+held fixed. However, while the choice of \\(n\\) in a binomial distribution is
+typically obvious, it is not usually so clear how to select a value for \\(r\\)
+in the negative binomial distribution.
+In terms of the index of dispersion \\(D =
+\frac{\textrm{Var}[y]}{\textrm{E}[y]}\\) and the mean \\(\mu\\), \\(r\\) is given
+by[^neg-bin-eta-d]:
+\\[ r = \frac{\mu}{D-1} \\]
 
-### TODO Inverse Gaussian
+Assuming that a reasonable choice of \\(r\\) can be selected, the natural
+parameter is \\(\eta = \log(1-p)\\), the log-partition function is \\(A(\eta)
+= - r \log(1 - e^\eta)\\), the mean is \\(\mu = \frac{rp}{1-p}\\), the canonical
+link function is \\(g(\mu) = \log \frac{r}{r+\mu}\\).
+With the obvious dispersion parameter \\(\phi = 1\\) the variance function is
+\\(V(\mu) = \mu \left( 1 + \frac{\mu}{r} \right)\\).
+Since \\(0 < p < 1\\), a non-canonical link function might be useful, such as
+\\(\eta = - \exp(-\mathbf{x}^\intercal \boldsymbol{\beta})\\).
+
+[^neg-bin-eta-d]:
+    It is a curious fact that the natural parameter \\(\eta\\) is a simple
+    function of the index of dispersion: \\[ \eta = -\log D \\]
+
+
+### Inverse Gaussian
+
+The inverse Gaussian (also known as the Wald) distribution has a somewhat
+misleading name -- it is NOT the distribution of the inverse of a
+Gaussian-distributed parameter.
+Rather it is the distribution of the time it takes for a Gaussian process to
+drift to a certain level.
+\begin{align}
+f(y; \mu, \lambda) &= \sqrt{\frac{\lambda}{2\pi x^3}}
+e^{-\frac{\lambda(y-\mu)^2}{2\mu^2 y}} \\\\\
+\log f(y; \mu, \lambda) &= -\frac{\lambda(y - \mu)^2}{2\mu^2 y} + \frac{1}{2}
+\log \frac{\lambda}{2\pi y^3} \\\\\
+&= -\frac{\lambda}{2\mu^2} y - \frac{\lambda}{2} \frac{1}{y} +
+\frac{\lambda}{\mu} + \frac{1}{2}\log \lambda + B(y)
+\end{align}
+The sufficient statistics are therefore \\(\mathbf{T}(y)^\intercal = [y, 1/y]\\)
+with corresponding natural parameters \\(\boldsymbol{\eta}^\intercal =
+[-\lambda/2\mu^2, -\lambda/2]\\), and the log-partition function is
+\\(A(\boldsymbol{\eta}) = 2\sqrt{\eta_1 \eta_2} - \frac{1}{2} \log (-2\eta_2) \\).
+The expected values of these statistics are \\(\textrm{E}[\mathbf{T}^\intercal(y); \mu,
+\lambda] = [\mu, 1/\mu + 1/\lambda] \\) or \\(\textrm{E}[\mathbf{T}^\intercal
+(y); \boldsymbol{\eta}] = \left[\sqrt{\frac{\eta_2}{\eta_1}},
+\sqrt{\frac{\eta_1}{\eta_2}} - \frac{1}{2\eta_2}\right]\\).
+
 
 ### Others
 Many other distributions are in the exponential family and should be amenable in
