@@ -570,7 +570,7 @@ parameters will increase without bound. This situation can be avoided by
 penalizing large values of the parameters in the likelihood function. 
 
 With all forms of regularization the scaling symmetry of each \\(x_k\\) is
-broken, so it is likely useful to center and normalize the data.
+broken, so it is likely useful to center and standardize the data.
 
 ### L2 regularization (ridge regression)
 
@@ -612,11 +612,23 @@ starting conditions) then it will never change.
 
 These are solved problems, although they may require heavier machinery.
 
+Parameter selection (choosing which parameters should be zeroed) could perhaps
+be combined with the AIC. Such a procedure would be very sensitive to the scale
+of the regressor parameters, so they would need to be standardized.
+
 ---
 ## TODO Goodness of fit
 * Compare log-likelihoods of fit model to saturated model
 * Aikaike and Bayesian information criteria
 * Generalized R^2?
+
+## TODO Significance of individual parameters
+
+The difference between the likelihood at the fitted values and the likelihood
+with one parameter fixed to zero should follow a \\(\chi^2\\) distribution with
+1 degree of freedom and implies the \\(Z\\)-score of the parameter. The
+likelihood should be re-minimized over the other parameters to allow them to
+describe some of what the parameter of interest captured.
 
 ---
 ## TODO Estimating the real dispersion parameter
