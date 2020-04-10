@@ -194,7 +194,8 @@ The expected response value, or mean \\(\mu\\), is known either from knowledge
 of the standard parameters \\(\boldsymbol{\theta}\\) or, assuming a single
 sufficient statistic \\(y\\), through the first derivative of the log-partition
 function as a function of the natural parameter \\(\eta\\).
-\\[ \mu = \frac{\partial A(\eta)}{\partial \eta} \\]
+\\[ \mu = \frac{\partial A(\eta)}{\partial \eta} \; \textrm{for } \mathbf{T}(y)
+= [y]\\]
 This expression can be inverted to get the natural parameter as a function of the
 mean \\(\eta(\mu)\\).
 To use the canonical link function, the natural parameter is equal to the linear
@@ -216,7 +217,7 @@ In fact, by the [inverse function
 theorem](https://en.wikipedia.org/wiki/Inverse_function_theorem), if
 \\(\eta(\mu) = t(\mu)\\), then the variance function is the reciprocal of the
 derivative of \\(t\\).
-\\[ V(\mu) = \left( \frac{\partial t}{\partial \mu} \right)^{-1} \\]
+\\[ V(\mu) = \frac{1}{\frac{\partial t}{\partial \mu}} \\]
 
 If there are multiple sufficient statistics, these statements should all be
 generalizable in the obvious way.
@@ -229,6 +230,13 @@ The variance function is now a symmetric matrix but there typically should be
 nothing stopping it from being expressible in terms of the expected values of
 the sufficient statistics; indeed, the multivariate version of the inverse
 function theorem should still apply.
+
+See [this
+post](https://stats.stackexchange.com/questions/40876/what-is-the-difference-between-a-link-function-and-a-canonical-link-function)
+for a helpful summary of non-canonical link functions, although be wary of the
+differing notation.
+Another note: When the canonical link function is used, \\(\mathbf{X}^\intercal
+\mathbf{y}\\) is a sufficient statistic for the whole data set.
 
 ---
 ## Iteratively re-weighted least squares
@@ -292,7 +300,7 @@ The canonical link function is the identity because if \\(\eta =
 The variance function is \\(V(\mu) = 1\\).
 
 Even with variable weights, the log-likelihood function is simple.
-\\[ \log l = -\frac{1}{2} (\mathbf{y} - \mathbf{X}^\intercal
+\\[ l = -\frac{1}{2} (\mathbf{y} - \mathbf{X}^\intercal
 \boldsymbol{\beta})^\intercal \mathbf{W} (\mathbf{y} - \mathbf{X}^\intercal
 \boldsymbol{\beta}) \\]
 This form shows the equivalence to weighted least squares (WLS), or ordinary
@@ -554,20 +562,61 @@ parameters, partition function, canonical link function, variance function, etc.
 for each common case.
 
 ---
-## TODO Regularization
+## Regularization
 
 Consider the case where the response variable is linearly separable by the
 predictor variables in logistic regression. The magnitude of the regression
 parameters will increase without bound. This situation can be avoided by
 penalizing large values of the parameters in the likelihood function. 
 
-### L2 regularization
+With all forms of regularization the scaling symmetry of each \\(x_k\\) is
+broken, so it is likely useful to center and normalize the data.
 
-### L1 regularization
+### L2 regularization (ridge regression)
+
+The parameters can be discouraged from taking very large values by penalizing
+the likelihood by their squares.
+\\[ l = l_0 - \frac{\lambda_2}{2} \sum_{k=1}^K \left| \beta_{k} \right|^2 \\]
+Note that the intercept \\(k=0\\) term is left out of the regularization. Most
+regression applications will not want to induce a bias in this term, and there
+should be no risk of failing to converge so long as there is more than a single
+value in the set of response variables \\(\mathbf{y}\\).
+
+This form of regression is particularly attractive in GLMs because the Jacobian
+and Hessian are easily adjusted:
+\begin{align}
+\mathbf{J} &\rightarrow \mathbf{J} - \lambda_2 \tilde{\boldsymbol{\beta}} \\\\\
+\mathbf{H} &\rightarrow \mathbf{H} - \lambda_2 \tilde{\mathbf{I}}
+\end{align}
+where the tildes are a (sloppy) way of indicating zeros in the \\(0\\) index.
+Note that the Hessian is negative-definite, so adding the regularization term
+does not risk making it degenerate. In fact, it can help condition for small
+eigenvalues of the Hessian.
+
+Another way of denoting the above is with a Tikhonov matrix
+\\(\boldsymbol{\Gamma} = \textrm{diag}(0, \sqrt{\lambda_2}, \ldots,
+\sqrt{\lambda_2})\\) which penalizes the likelihood by
+\\(\left|\boldsymbol{\Gamma}\boldsymbol{\beta}\right|^2/2\\). This makes the
+changes to the Jacobian and Hessian easier to express.
+\begin{align}
+\mathbf{J} &\rightarrow \mathbf{J} - \boldsymbol{\Gamma}^\intercal\boldsymbol{\Gamma}\boldsymbol{\beta} \\\\\
+\mathbf{H} &\rightarrow \mathbf{H} - \boldsymbol{\Gamma}^\intercal\boldsymbol{\Gamma}
+\end{align}
+
+### TODO L1 regularization (lasso)
+
+This could be a bit tricky using IRLS because the Jacobian is non-differentiable
+and the Hessian becomes infinite when \\(\beta_k = 0\\) for any \\(k \geq 1\\).
+This means that if a parameter is ever at zero exactly (unlikely, except for
+starting conditions) then it will never change.
+
+These are solved problems, although they may require heavier machinery.
 
 ---
 ## TODO Goodness of fit
-Compare log-likelihoods of fit model to saturated model
+* Compare log-likelihoods of fit model to saturated model
+* Aikaike and Bayesian information criteria
+* Generalized R^2?
 
 ---
 ## TODO Estimating the real dispersion parameter
@@ -578,4 +627,5 @@ See the latter parts of [these notes](http://people.stat.sfu.ca/~raltman/stat402
 ## TODO Numerical considerations
 
 ---
+<!-- Footnotes will appear below the document. -->
 Footnotes:
