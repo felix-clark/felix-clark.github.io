@@ -182,7 +182,7 @@ approach for a general response function, but for now I note that the Hessian
 still appears symmetric so long as \\(\mathbf{W}\\) is.
 
 ---
-## Methods for computing the link and variance functions
+## Comments on computing the link and variance functions
 
 In the standard description the link function generally relates the expected
 value of the response variable to the linear predictor.
@@ -197,7 +197,7 @@ function as a function of the natural parameter \\(\eta\\).
 \\[ \mu = \frac{\partial A(\eta)}{\partial \eta} \; \textrm{for } \mathbf{T}(y)
 = [y]\\]
 This expression can be inverted to get the natural parameter as a function of the
-mean \\(\eta(\mu)\\).
+mean \\(\eta(\mu) = (A')^{-1}(\mu)\\).
 To use the canonical link function, the natural parameter is equal to the linear
 predictor so that \\( \eta_0(\omega) = \omega \\).
 A different parameterization can be used for \\(\eta\\), which implies a change
@@ -511,6 +511,7 @@ link function is \\(g(\mu) = \log \frac{r}{r+\mu}\\).
 With the obvious dispersion parameter \\(\phi = 1\\) the variance function is
 \\(V(\mu) = \mu \left( 1 + \frac{\mu}{r} \right)\\).
 Since \\(0 < p < 1\\), a non-canonical link function might be useful, such as
+the one implied by
 \\(\eta = - \exp(-\mathbf{x}^\intercal \boldsymbol{\beta})\\).
 
 [^neg-bin-eta-d]:
@@ -603,6 +604,19 @@ changes to the Jacobian and Hessian easier to express.
 \mathbf{H} &\rightarrow \mathbf{H} - \boldsymbol{\Gamma}^\intercal\boldsymbol{\Gamma}
 \end{align}
 
+The IRLS update equation is still quite simple if written in terms of solving a
+new guess \\( \boldsymbol{\beta}' \\) in terms of the previous
+\\(\boldsymbol{\beta}_\textrm{last}\\).
+
+\begin{equation}
+<!-- \left( \mathbf{X}^\intercal \mathbf{S} \mathbf{X} + \boldsymbol{\Gamma}^2 \right) -->
+<!-- \boldsymbol{\beta}' = \mathbf{X}^\intercal \left( \mathbf{S} -->
+<!-- \mathbf{X} \boldsymbol{\beta}_\textrm{last} + \mathbf{y} - -->
+<!-- g^{-1}(\mathbf{X}\boldsymbol{\beta}_\textrm{last}) \right) -->
+\end{equation}
+Note that the regularization matrix only appears once, as a correction to the
+diagonals of the Hessian.
+
 ### TODO L1 regularization (lasso)
 
 This could be a bit tricky using IRLS because the Jacobian is non-differentiable
@@ -614,29 +628,53 @@ These are solved problems, although they may require heavier machinery.
 
 Parameter selection (choosing which parameters should be zeroed) could perhaps
 be combined with the AIC. Such a procedure would be very sensitive to the scale
-of the regressor parameters, so they would need to be standardized.
+of the regressor parameters, so they would need to be standardized. In general,
+though, solving for the best set of parameters is NP-hard, so heuristics must be used.
+
+### TODO Effective degrees of freedom under regularization
+
+See
+[wikipedia](https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)#In_non-standard_regression)
+and [this paper](https://arxiv.org/abs/1311.2791).
+
+---
+## TODO Estimating the real dispersion parameter
+
+Typically the method of moments is used.
+
+See the latter parts of [this lecture on the dispersion parameter](http://people.stat.sfu.ca/~raltman/stat402/402L25.pdf).
 
 ---
 ## TODO Goodness of fit
+
 * Compare log-likelihoods of fit model to saturated model
+See [these notes](http://people.stat.sfu.ca/~raltman/stat402/402L11.pdf) on computing the deviance.
 * Aikaike and Bayesian information criteria
 * Generalized R^2?
 
+---
 ## TODO Significance of individual parameters
 
 The difference between the likelihood at the fitted values and the likelihood
 with one parameter fixed to zero should follow a \\(\chi^2\\) distribution with
 1 degree of freedom and implies the \\(Z\\)-score of the parameter. The
-likelihood should be re-minimized over the other parameters to allow them to
-describe some of what the parameter of interest captured.
+likelihood should possibly be re-minimized over the other parameters to allow
+them to describe some of what the parameter of interest captured; however, this
+could cause to correlated parameters to both appear insignificant when at least
+one of them is highly relevant.
 
----
-## TODO Estimating the real dispersion parameter
-
-See the latter parts of [these notes](http://people.stat.sfu.ca/~raltman/stat402/402L25.pdf).
 
 ---
 ## TODO Numerical considerations
+
+---
+## Other references
+
+* https://www.stat.cmu.edu/~ryantibs/advmethods/notes/glm.pdf
+* https://bwlewis.github.io/GLM/
+* https://statmath.wu.ac.at/courses/heather_turner/glmCourse_001.pdf
+* [Maalouf, M., & Siddiqi, M. (2014). Weighted logistic regression for large-scale imbalanced and rare events data. Knowledge-Based Systems, 59, 142–148.](https://doi.org/10.1016/j.knosys.2014.01.012)
+* [Convergence problems in GLMs](https://journal.r-project.org/archive/2011-2/RJournal_2011-2_Marschner.pdf)
 
 ---
 <!-- Footnotes will appear below the document. -->
