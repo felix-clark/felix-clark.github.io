@@ -238,6 +238,14 @@ differing notation.
 Another note: When the canonical link function is used, \\(\mathbf{X}^\intercal
 \mathbf{y}\\) is a sufficient statistic for the whole data set.
 
+NOTE: When the canonical link function allows un-physical values, the [Jeffreys
+prior](https://en.wikipedia.org/wiki/Jeffreys_prior) may be useful in
+determining a natural link function. For instance, the Jeffrey's prior for the
+variance of a normal distribution imposes that the logarithm of the variance is
+uniformly distributed. This might suggest that the linear predictor for the
+variance should be associated with the logarithm of the variance, i.e. the
+variance expressed as an exponential function of the linear predictor.
+
 ---
 ## Iteratively re-weighted least squares
 
