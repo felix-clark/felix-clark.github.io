@@ -281,8 +281,30 @@ with different weights, a simple adjustment is needed.
 \boldsymbol{\beta} = \mathbf{X}^\intercal \mathbf{W} \left[ \mathbf{y} -
 g^{-1}(\mathbf{X}\boldsymbol{\beta})\right]
 \end{equation}
-A Hermitian-solve algorithm can be applied to generate successive steps for
-\\(\boldsymbol{\beta}\\) until a desired tolerance is reached.
+A Hermitian-solve algorithm can be applied to generate successive guess for
+\\(\boldsymbol{\beta}\\) based on the previous guess until a desired tolerance
+is reached:
+\begin{equation}
+\left( \mathbf{X}^\intercal \mathbf{W} \mathbf{S} \mathbf{X} \right)
+\boldsymbol{\beta}_{l+1} = \mathbf{X}^\intercal \mathbf{W} \left[ \mathbf{y} -
+g^{-1}\left(\mathbf{X}\boldsymbol{\beta}_l\right) + \mathbf{S} \mathbf{X}
+\boldsymbol{\beta}_l\right]
+\end{equation}
+
+---
+## Control variables
+
+In practical applications we often want to control for additional variables
+where the effect on the response is known. This can be expressed as an
+adjustment to the linear predictors for each observed \\(y^{(i)}\\).
+\\[ g(\textrm{E}[y^{(i)}]) = \omega_0^{(i)} + \mathbf{x}^{(i)\intercal} \boldsymbol{\beta} \\]
+This adjusts the IRLS step to the following.
+\begin{equation}
+\left( \mathbf{X}^\intercal \mathbf{W} \mathbf{S} \mathbf{X} \right)
+\boldsymbol{\beta}_{l+1} = \mathbf{X}^\intercal \mathbf{W} \left[ \mathbf{y} -
+g^{-1}\left(\boldsymbol{\omega_0} + \mathbf{X}\boldsymbol{\beta}_l\right) +
+\mathbf{S} \mathbf{X} \boldsymbol{\beta}_l\right]
+\end{equation}
 
 ---
 ## Case studies
