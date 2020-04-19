@@ -608,10 +608,12 @@ broken, so it is likely useful to center and standardize the data.
 The parameters can be discouraged from taking very large values by penalizing
 the likelihood by their squares.
 \\[ l = l_0 - \frac{\lambda_2}{2} \sum_{k=1}^K \left| \beta_{k} \right|^2 \\]
-Note that the intercept \\(k=0\\) term is left out of the regularization. Most
-regression applications will not want to induce a bias in this term, and there
-should be no risk of failing to converge so long as there is more than a single
-value in the set of response variables \\(\mathbf{y}\\).
+This can be thought of as imposing a Gaussian prior distribution on the
+\\(\beta_k\\) parameters. Note that the intercept \\(k=0\\) term is left out of
+the regularization. Most regression applications will not want to induce a bias
+in this term, and there should be no risk of failing to converge so long as
+there is more than a single value in the set of response variables
+\\(\mathbf{y}\\).
 
 This form of regression is particularly attractive in GLMs because the Jacobian
 and Hessian are easily adjusted:
@@ -653,13 +655,48 @@ This could be a bit tricky using IRLS because the Jacobian is non-differentiable
 and the Hessian becomes infinite when \\(\beta_k = 0\\) for any \\(k \geq 1\\).
 This means that if a parameter is ever at zero exactly (unlikely, except for
 starting conditions) then it will never change.
-
 These are solved problems, although they may require heavier machinery.
+
+We could use a procedure that smooths the discontinuities by approximating the
+delta functions in the Hessian with a smooth distribution of some width, for
+instance a logistic distribution (or a Gaussian, which would be more
+computationally expensive due to the integrals of the CDF). This width could be
+configured.
+
+For instance, consider replacing the \\(\lambda_1 |\beta|\\)
+penalty terms with a smoothed function \\(\lambda_1 s \log \left[\cosh\left(
+\frac{\beta}{s}\right)\right]\\) that uses a parameter \\(s\\) to indicate the
+characteristic width of the smoothing. This seems to be equivalent to replaceing
+the Laplace prior distribution of parameters under L1 regression with a
+hyperbolic secant prior. The function approaches the absolute value as \\(s
+\rightarrow 0\\) and for large beta with any \\(s\\) it rapidly tends towards
+\\(|\beta| - s \log 2\\). It is continuously differentiable so it can be easily
+included in the Jacobian and Hessian expressions. It does raise an additional
+ambiguity over a reasonable value to pick for \\(s\\) and likely increases the
+sensitivity of the regression to non-standardized covariate data. Regression
+parameters near or smaller than \\(s\\) can be interpreted as being "zeroed" by
+the regularization.
 
 Parameter selection (choosing which parameters should be zeroed) could perhaps
 be combined with the AIC. Such a procedure would be very sensitive to the scale
 of the regressor parameters, so they would need to be standardized. In general,
 though, solving for the best set of parameters is NP-hard, so heuristics must be used.
+
+### General effect on IRLS
+
+For a general likelihood penalization
+\\[ l_\Lambda = l_0 - \Lambda(\boldsymbol{\beta}) \\]
+the IRLS step for the canonical link function (but note that a non-canonical
+link function does not affect the regularization terms) is the following.
+\begin{equation}
+<!-- \left( \mathbf{X}^\intercal \mathbf{S} \mathbf{X} + \nabla \nabla^\intercal -->
+<!-- \Lambda \right) \boldsymbol{\beta}' = \mathbf{X}^\intercal \left[ \mathbf{y} - -->
+<!-- g^{-1}(\mathbf{X}\boldsymbol{\beta}) + -->
+<!-- \mathbf{S} \mathbf{X} \boldsymbol{\beta} \right] - (\nabla -->
+<!-- \Lambda) + (\nabla \nabla^\intercal \Lambda) \boldsymbol{\beta} -->
+\end{equation}
+Notice how the last two terms cancel for purely L2 regularization, but they must
+be considered in the general case.
 
 ### TODO Effective degrees of freedom under regularization
 
