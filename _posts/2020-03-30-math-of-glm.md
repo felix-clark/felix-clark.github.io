@@ -197,18 +197,17 @@ function as a function of the natural parameter \\(\eta\\).
 \\[ \mu = \frac{\partial A(\eta)}{\partial \eta} \; \textrm{for } \mathbf{T}(y)
 = [y]\\]
 This expression can be inverted to get the natural parameter as a function of the
-mean \\(\eta(\mu) = (A')^{-1}(\mu)\\).
+mean \\(\eta(\mu) = g_0(\mu) = (A')^{-1}(\mu)\\).
 To use the canonical link function, the natural parameter is equal to the linear
 predictor so that \\( \eta_0(\omega) = \omega \\).
 A different parameterization can be used for \\(\eta\\), which implies a change
 in the link function.
-Let the natural parameter be defined through an invertible transformation
-\\(s\\) on the linear predictor.
-\\[ \eta(\omega) = s(\omega) \\]
-Given this transformation and the expression for \\(\eta\\) in terms of
-\\(\mu\\), the effect of this transformation on the link function is given by
-the following equation.
-\\[ g(\mu) = s^{-1}\left( \eta(\mu) \right) \\]
+By comparing the expectation value for
+two different link functions, the natural parameter is found for an arbitrary link
+function $$g$$ in terms of the canonical link function $$g_0$$ and linear predictor
+$$\omega$$.
+\\[ \eta(\omega) = g_0 \left( g^{-1} (\omega) \right) \\]
+
 The same function \\(\eta(\mu)\\) can be used to compute the variance function
 \\(V(\mu)\\).
 \\[ V(\mu) = \left. \frac{\partial^2 A(\eta)}{\partial \eta^2} \right|_{\eta = \eta(\mu)} \\]
