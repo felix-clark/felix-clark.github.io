@@ -704,6 +704,51 @@ See
 and [this paper](https://arxiv.org/abs/1311.2791).
 
 ---
+## Saturated likelihood and deviance
+
+The saturated likelihood is the likelihood of a model with enough free
+parameters to fit every \\(y_i\\) exactly. It represents the likelihood of the
+best possible fit, which is often zero (OLS, binary logistic) but not always.
+As a function only of \\(y_i\\), computing the saturated likelihood is
+tantamount to replacing \\(\mathbf{x}_i\cdot\boldsymbol{\beta}\\) with
+\\(g(y_i)\\).
+
+\\[l_{\textrm{sat}}(\mathbf{y}) = \sum_{i=1}^N
+\boldsymbol{\eta}(g(y^{(i)})) \cdot
+\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(g(y^{(i)})) \right)\\]
+
+The deviance, which measures the difference between the observations and the
+model's predictions for each data point, is given by[^deviance-d]
+\\[D = -2\left[ l(\mathbf{y}|\mathbf{x}, \boldsymbol{\beta}) - l_{\textrm{sat}}(\mathbf{y}) \right]\\]
+
+In OLS, this deviance is equal to the sum of squares of the residuals, and it
+can be interpreted as a generalization of that quantity.
+
+[^deviance-d]:
+    This is a different \\(D\\) than the one used elsewhere for index of
+    dispersion.
+
+---
+## Null likelihood
+
+The null likelihood is the likelihood of a model where none of the covariates
+are used. An intercept term is allowed, unless the original model explicitly
+fixed the intercept \\(\beta_0 = 0\\). In other words, the null model is a
+model in which \\(\mathbf{x}\cdot\boldsymbol{\beta} = \beta\\). It can be shown
+(by setting the gradient to zero) that the maximum likelihood is found by
+\\(E[y|\beta] = \bar{y}\\) (even for non-canonical link functions), and thus \\(\beta = g(\bar{y})\\).
+
+For canonical link functions, \\(\eta = \beta = g(\bar{y})\\), but in general
+
+\\[l_{0}(\mathbf{y}) = \sum_{i=1}^N \boldsymbol{\eta}(g(\bar{y})) \cdot
+\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(g(\bar{y})) \right)\\]
+
+In the (unlikely) case of \\(\beta = 0\\) being fixed in the model, then instead:
+\\[l_{0}(\mathbf{y}) = \sum_{i=1}^N \boldsymbol{\eta}(0) \cdot
+\mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(0) \right)\\]
+
+
+---
 ## TODO Estimating the real dispersion parameter
 
 Typically the method of moments is used.
