@@ -736,7 +736,8 @@ are used. An intercept term is allowed, unless the original model explicitly
 fixed the intercept \\(\beta_0 = 0\\). In other words, the null model is a
 model in which \\(\mathbf{x}\cdot\boldsymbol{\beta} = \beta\\). It can be shown
 (by setting the gradient to zero) that the maximum likelihood is found by
-\\(E[y|\beta] = \bar{y}\\) (even for non-canonical link functions), and thus \\(\beta = g(\bar{y})\\).
+\\(E[y|\beta] = \bar{y}\\) (even for non-canonical link functions), and thus
+\\(\beta = g(\bar{y})\\).
 
 For canonical link functions, \\(\eta = \beta = g(\bar{y})\\), but in general
 
@@ -746,6 +747,10 @@ For canonical link functions, \\(\eta = \beta = g(\bar{y})\\), but in general
 In the (unlikely) case of \\(\beta = 0\\) being fixed in the model, then instead:
 \\[l_{0}(\mathbf{y}) = \sum_{i=1}^N \boldsymbol{\eta}(0) \cdot
 \mathbf{T}(y^{(i)}) - A\left(\boldsymbol{\eta}(0) \right)\\]
+
+When linear offset control factors are included, \\(\beta\\) cannot be solved
+analytically in general. In this case, a model can be re-fit using only the
+constant intercept term.
 
 
 ---
