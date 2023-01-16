@@ -602,7 +602,9 @@ penalizing large values of the parameters in the likelihood function.
 With all forms of regularization the scaling symmetry of each \\(x_k\\) is
 broken, so it is likely useful to center and standardize the data.
 
-### L2 regularization (ridge regression)
+Further reading: [Regularization paths for GLMs via Coordinate Descent](https://doi.org/10.18637/jss.v033.i01)
+
+### Ridge regression (L2 regularization)
 
 The parameters can be discouraged from taking very large values by penalizing
 the likelihood by their squares.
@@ -648,38 +650,29 @@ new guess \\( \boldsymbol{\beta}' \\) in terms of the previous
 Note that the regularization matrix only appears once, as a correction to the
 diagonals of the Hessian.
 
-### TODO L1 regularization (lasso)
+### Lasso (L1 regularization)
 
-This could be a bit tricky using IRLS because the Jacobian is non-differentiable
-and the Hessian becomes infinite when \\(\beta_k = 0\\) for any \\(k \geq 1\\).
-This means that if a parameter is ever at zero exactly (unlikely, except for
-starting conditions) then it will never change.
-These are solved problems, although they may require heavier machinery.
+The lasso penalizes the likelihood by the sum of the absolute values of the coefficients.
+\\[ l = l_0 - \lambda_1 \sum_{k=1}^K \left| \beta_{k} \right| \\]
+This corresponds to a prior distribution for each parameter of Laplacian with
+width \\(\lambda_1^{-1}\\). It tends to set small coefficients to exactly zero,
+in contrast to ridge regression which mostly makes large coefficients smaller.
 
-We could use a procedure that smooths the discontinuities by approximating the
-delta functions in the Hessian with a smooth distribution of some width, for
-instance a logistic distribution (or a Gaussian, which would be more
-computationally expensive due to the integrals of the CDF). This width could be
-configured.
+There is difficulty in naively adjusting the Hessian and Jacobian using IRLS
+because the likelihood is non-differentiable and the Hessian becomes infinite
+when \\(\beta_k = 0\\) for any \\(k \geq 1\\).
 
-For instance, consider replacing the \\(\lambda_1 |\beta|\\)
-penalty terms with a smoothed function \\(\lambda_1 s \log \left[\cosh\left(
-\frac{\beta}{s}\right)\right]\\) that uses a parameter \\(s\\) to indicate the
-characteristic width of the smoothing. This seems to be equivalent to replaceing
-the Laplace prior distribution of parameters under L1 regression with a
-hyperbolic secant prior. The function approaches the absolute value as \\(s
-\rightarrow 0\\) and for large beta with any \\(s\\) it rapidly tends towards
-\\(|\beta| - s \log 2\\). It is continuously differentiable so it can be easily
-included in the Jacobian and Hessian expressions. It does raise an additional
-ambiguity over a reasonable value to pick for \\(s\\) and likely increases the
-sensitivity of the regression to non-standardized covariate data. Regression
-parameters near or smaller than \\(s\\) can be interpreted as being "zeroed" by
-the regularization.
+In the simplest case of OLS with orthogonal covariates (i.e. \\(\mathbf{X}^\intercal \mathbf{X} = \mathbf{I}\\)) then the magnitude of each parameter is reduced by \\(\lambda_1\\); if the absolute value is already less than \\(\lambda_1\\) then it is set to zero.
+\\[\beta_k \rightarrow \textrm{sgn}(\beta_k) \, \textrm{max}\left(0, |\beta_k| - \lambda_1 \right)\\]
 
-Parameter selection (choosing which parameters should be zeroed) could perhaps
-be combined with the AIC. Such a procedure would be very sensitive to the scale
-of the regressor parameters, so they would need to be standardized. In general,
-though, solving for the best set of parameters is NP-hard, so heuristics must be used.
+Note that in the case of completely correlated covariates, lasso does not
+uniquely determine the coefficients. An L2 penalty breaks the likelihood
+symmetry, so if this is a possibility then the elastic net is recommended.
+
+Further reading:
+* [Efficient L1-regularized logistic regression](https://www.andrewng.org/publications/efficient-l1-regularized-logistic-regression/)
+
+### Elastic net (L1 + L2 regularization)
 
 ### General effect on IRLS
 
