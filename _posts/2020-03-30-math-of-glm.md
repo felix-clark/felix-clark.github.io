@@ -654,16 +654,36 @@ diagonals of the Hessian.
 
 The lasso penalizes the likelihood by the sum of the absolute values of the coefficients.
 \\[ l = l_0 - \lambda_1 \sum_{k=1}^K \left| \beta_{k} \right| \\]
-This corresponds to a prior distribution for each parameter of Laplacian with
-width \\(\lambda_1^{-1}\\). It tends to set small coefficients to exactly zero,
-in contrast to ridge regression which mostly makes large coefficients smaller.
+This corresponds to a prior Laplace distribution for each parameter with width
+\\(\lambda_1^{-1}\\). It tends to set small coefficients to exactly zero, in
+contrast to ridge regression which mostly makes large coefficients smaller.
 
 There is difficulty in naively adjusting the Hessian and Jacobian using IRLS
 because the likelihood is non-differentiable and the Hessian becomes infinite
 when \\(\beta_k = 0\\) for any \\(k \geq 1\\).
 
 In the simplest case of OLS with orthogonal covariates (i.e. \\(\mathbf{X}^\intercal \mathbf{X} = \mathbf{I}\\)) then the magnitude of each parameter is reduced by \\(\lambda_1\\); if the absolute value is already less than \\(\lambda_1\\) then it is set to zero.
-\\[\beta_k \rightarrow \textrm{sgn}(\beta_k) \, \textrm{max}\left(0, |\beta_k| - \lambda_1 \right)\\]
+\\[\beta_k \rightarrow S_{\lambda_1}\left(\beta_k\right) \equiv \textrm{sgn}(\beta_k) \, \textrm{max}\left(0, |\beta_k| - \lambda_1 \right)\\]
+
+The Alternating Direction Method of Multipliers (ADMM) can be used for L1
+regularization. This introduces additional variables to be updated in exchange
+for separating the non-smooth piece of the likelihood.
+
+\begin{align}
+<!-- \boldsymbol{\beta}^{(k+1)} &= \textrm{argmin}_{\boldsymbol{\beta}} \left( l(\boldsymbol{\beta}) + \frac{\rho}{2}\left| \boldsymbol{\beta} - \boldsymbol{\gamma}^{(k)} + \mathbf{u}^{(k)} \right|_2^2 \right) \\\\\ -->
+<!-- \boldsymbol{\gamma}^{(k+1)} &= \textrm{argmin}_{\boldsymbol{\gamma}} \left( \lambda_1 \left|\boldsymbol{\gamma}\right|_1 + \frac{\rho}{2}\left| \boldsymbol{\beta}^{(k+1)} - \boldsymbol{\gamma} + \mathbf{u}^{(k)} \right|_2^2 \right) \\\\\ -->
+<!-- &= S_{\lambda_1 / \rho} \left( \boldsymbol{\beta}^{(k+1)} + \mathbf{u}^{(k)} \right) \\\\\ -->
+<!-- \mathbf{u}^{(k+1)} &= \mathbf{u}^{(k)} + \boldsymbol{\beta}^{(k+1)} - \boldsymbol{\gamma}^{(k+1)} -->
+\end{align}
+
+Presumably the iteration can start with \\(\gamma = \beta\\) and \\(u = 0\\), and
+\\(\rho\\) should be able to be anything, so \\(\rho=1\\) should work. The
+first equation can be solved by IRLS, and in the quadratic approximation, only
+one step could be taken here. The \\(u\\) variable is the cumulative sum of the
+residuals between \\(\beta\\) and \\(\gamma\\). As long as the difference is
+added to \\(u\\),k \\(\beta\\) and \\(\gamma\\) don't necessarily have to be
+tracked completely separately because each relies only on the previous
+iteration of the other one.
 
 Note that in the case of completely correlated covariates, lasso does not
 uniquely determine the coefficients. An L2 penalty breaks the likelihood
@@ -671,8 +691,19 @@ symmetry, so if this is a possibility then the elastic net is recommended.
 
 Further reading:
 * [Efficient L1-regularized logistic regression](https://www.andrewng.org/publications/efficient-l1-regularized-logistic-regression/)
+* [SO summary with useful links](https://math.stackexchange.com/a/3608432), in particular:
+* [... Statistical Learning via the ADMM (Section 6.3)](https://web.stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf)
 
 ### Elastic net (L1 + L2 regularization)
+
+The elastic net includes both L1 and L2 terms. The L2 term can be included by
+adding a constant diagonal to the Hessian, but it can also be included in the
+ADMM update by modifying the \\(\gamma\\) update slightly:
+
+\\[ \boldsymbol{\gamma}^{(k+1)} = \frac{1}{1 + \lambda_2/\rho} S_{\lambda_1/\rho}(\boldsymbol{\beta}^{(k+1)} + \mathbf{u}^{(k)}) \\]
+
+This can be derived by adding \\(\lambda_2|\gamma|_2^2\\) to the function in
+the argmin over \\(\boldsymbol{\gamma}\\).
 
 ### General effect on IRLS
 
