@@ -676,7 +676,7 @@ for separating the non-smooth piece of the likelihood.
 <!-- \mathbf{u}^{(k+1)} &= \mathbf{u}^{(k)} + \boldsymbol{\beta}^{(k+1)} - \boldsymbol{\gamma}^{(k+1)} -->
 \end{align}
 
-Presumably the iteration can start with \\(\gamma = \beta\\) and \\(u = 0\\), and
+Presumably the iteration can start with \\(\gamma^{(0)}(\beta^{(0)})\\) and \\(u = 0\\), and
 \\(\rho\\) should be able to be anything, so \\(\rho=1\\) should work. The
 first equation can be solved by IRLS, and in the quadratic approximation, only
 one step could be taken here. The \\(u\\) variable is the cumulative sum of the
@@ -684,6 +684,9 @@ residuals between \\(\beta\\) and \\(\gamma\\). As long as the difference is
 added to \\(u\\),k \\(\beta\\) and \\(\gamma\\) don't necessarily have to be
 tracked completely separately because each relies only on the previous
 iteration of the other one.
+
+In practice \\(\rho\\) is often varied over time to promote convergence. This
+requires a rescaling of \\(u\\) for each step that \\(\rho\\) is changed.
 
 Note that in the case of completely correlated covariates, lasso does not
 uniquely determine the coefficients. An L2 penalty breaks the likelihood
