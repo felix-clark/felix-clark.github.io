@@ -685,8 +685,15 @@ added to \\(u\\),k \\(\beta\\) and \\(\gamma\\) don't necessarily have to be
 tracked completely separately because each relies only on the previous
 iteration of the other one.
 
-In practice \\(\rho\\) is often varied over time to promote convergence. This
-requires a rescaling of \\(u\\) for each step that \\(\rho\\) is changed.
+In practice, the minimization over \\(\beta\\) in the first equation does not
+need to performed to convergence. A single IRLS step can be executed instead,
+which makes the L1 ADMM implementation simpler - just include the augmented
+terms in the Hessian and Jacobian and run the \\(\gamma\\) and \\(u\\) updates
+in each iteration.
+
+Another consideration is that \\(\rho\\) is often varied over time to promote
+convergence, a practice called \emph{redisual balance}. This also requires a
+rescaling of \\(u\\) for each step that \\(\rho\\) is changed.
 
 Note that in the case of completely correlated covariates, lasso does not
 uniquely determine the coefficients. An L2 penalty breaks the likelihood
