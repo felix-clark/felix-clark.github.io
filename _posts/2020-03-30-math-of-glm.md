@@ -789,21 +789,21 @@ constant intercept term.
 ---
 ## Projection matrix and leverage
 
-In OLS, the projection matrix \\(\mathbf{H} =
+In OLS, the projection matrix \\(\mathbf{P} =
 \mathbf{X}\left(\mathbf{X}^{\intercal}\mathbf{X}\right)^{-1}\mathbf{X}^{\intercal}\\)
 (also known as the influence matrix or hat matrix) maps the vector of response
-values to the vector of predicted values \\(\mathbf{H}\mathbf{y} =
+values to the vector of predicted values \\(\mathbf{P}\mathbf{y} =
 E[\mathbf{y}|\mathbf{X}\boldsymbol{\beta}] \equiv \hat{\mathbf{y}}\\). While
 this precise property cannot be satisfied for all GLMs due to the
 non-linearities, an analogue can still be defined that retains useful
 properties.
 
-<!-- \\[H_{ij} \equiv \frac{\partial \hat{y}_i}{\partial y_j} \\] -->
+<!-- \\[P_{ij} \equiv \frac{\partial \hat{y}_i}{\partial y_j} \\] -->
 There are a few possible conventions for this generalization, but all result in
 the same diagonal. We'll start with the fundamental-looking definition and
 expand the total derivative in partials with respect to the fit parameters:
 \begin{align}
-<!-- H_{ij} &\equiv \frac{\partial \hat{y}_i}{\partial y_j} \\\\\ -->
+<!-- P_{ij} &\equiv \frac{\partial \hat{y}_i}{\partial y_j} \\\\\ -->
 <!-- &= \left[\nabla_\beta g^{-1}\left(\mathbf{x}^{(i)}\cdot\boldsymbol{\beta}\right)\right] \cdot \frac{\partial \boldsymbol{\beta}}{\partial y_j} -->
 \end{align}
 This is not symmetric, but it will turn out to be orthogonal to the response
@@ -813,28 +813,28 @@ function, and is equal to
 \\(\mathbf{x}^{(i)}S_{ii}\eta'^{(i)}\\). The
 second term can be derived by inspecting the IRLS step
 equation and perturbing it around the minimum. Altogether this yields
-\\[ \mathbf{H} = \boldsymbol{\eta}' \mathbf{S} \mathbf{X} \left(\mathbf{X}^\intercal \mathbf{W} \boldsymbol{\eta}'^{2} \mathbf{S} \mathbf{X}\right)^{-1} \mathbf{X}^\intercal \mathbf{W} \boldsymbol{\eta}' \\]
+\\[ \mathbf{P} = \boldsymbol{\eta}' \mathbf{S} \mathbf{X} \left(\mathbf{X}^\intercal \mathbf{W} \boldsymbol{\eta}'^{2} \mathbf{S} \mathbf{X}\right)^{-1} \mathbf{X}^\intercal \mathbf{W} \boldsymbol{\eta}' \\]
 where \\(\mathbf{S}, \mathbf{W}, \boldsymbol{\eta}'\\) are treated as diagonal
 matrices with elements as defined above. Note that this satisfies
-\\(\mathbf{H}^2 = \mathbf{H}\\) exactly so it is a projection matrix, and at
+\\(\mathbf{P}^2 = \mathbf{P}\\) exactly so it is a projection matrix, and at
 the fit minimum it is orthogonal to the response residuals
-\\(\mathbf{H}\cdot\left(\mathbf{y} - \hat{\mathbf{y}}\right) = 0\\) as can be
+\\(\mathbf{P}\cdot\left(\mathbf{y} - \hat{\mathbf{y}}\right) = 0\\) as can be
 observed from the IRLS step equation and the convergence of the parameters such
 that \\(\Delta \boldsymbol{\beta} = 0\\).
 
 It can be shown[^leave-one-out] that the change in the parameters
 \\(\boldsymbol{\beta}^{(-i)}\\) resulting from excluding an observation \\(i\\)
 is, using a single-step approximation (for the unweighted, canonical case):
-\\[\left(\mathbf{X}^\intercal \mathbf{S} \mathbf{X} \right) \Delta \boldsymbol{\beta}^{(-i)} = \frac{\mathbf{x}^{(i)} e^{(i)}}{1 - h_{ii}} \\]
+\\[\left(\mathbf{X}^\intercal \mathbf{S} \mathbf{X} \right) \Delta \boldsymbol{\beta}^{(-i)} = \frac{\mathbf{x}^{(i)} e^{(i)}}{1 - h_{i}} \\]
 where \\(e^{(i)}\equiv y^{(i)} - \hat{y}^{(i)}\\) are the response residuals.
-The factor \\(h_{ii} \equiv \mathbf{H}_{ii} \\) is called the leverage of the
+The factor \\(h_{i} \equiv \mathbf{P}_{ii} \\) is called the leverage of the
 ith observation, and is a measure of how strongly a given observation affects
 its corresponding prediction.
 
 [^leave-one-out]:
     The ingredients for this derivation are the linear algebra identity
     \\[ \left(\mathbf{A} + \mathbf{u}\mathbf{v}^\intercal\right)^{-1} = \mathbf{A}^{-1} - \frac{\left(\mathbf{A}^{-1}\mathbf{u}\right) \left(\mathbf{v}^\intercal \mathbf{A}^{-1} \right)}{1 + \mathbf{v}^\intercal\mathbf{A}^{-1}\mathbf{u}}\\]
-    and the observation that \\(H_{ii} = S_{ii}\mathbf{x}^\intercal{}^{(i)} \left(\mathbf{X}^\intercal \mathbf{S X}\right)^{-1}\mathbf{x}^{(i)}\\) .
+    and the observation that \\(P_{ii} = S_{ii}\mathbf{x}^\intercal{}^{(i)} \left(\mathbf{X}^\intercal \mathbf{S X}\right)^{-1}\mathbf{x}^{(i)}\\) .
 
 By Taylor expanding to first order in \\(\Delta \boldsymbol{\beta}^{(-i)}\\), the leave-out residual that corrects for the influence of the observation itself is given by \\(e^{(-i)} \equiv y^{(i)} - \hat{y}^{(-i)} = \frac{e^{(i)}}{1 - h_{ii}}\\). This is useful for outlier detection.
 
