@@ -11,6 +11,7 @@
 \author{Felix Michael Clark}
 \begin{document}
 \maketitle
+\tableofcontents
 
 \section{Introduction}
 
@@ -91,13 +92,13 @@ By definition, the canonical link function is the one that results from using
 \(\eta = \mathbf{x}\cdot\bbeta\) which results in \(\eta' = 1\).
 
 The Hessian is given by
-\begin{equation}
+\begin{multline}
 	\nabla_{\beta^a} \nabla^\intercal_{\beta^b} l = \sum_{i=1}^N \mathbf{x}^{(i)}
 	\mathbf{x}^{\intercal(i)} \left\{ - \eta^{a \prime}
-	\textrm{Cov}\left[T^{ab}(y^{(i)}) \middle| \boldsymbol{\eta}\right] \eta^{b \prime} +
-	\delta_{ab} \eta^{a\prime\prime}\left( T^b (y^{(i)}) -
+	\textrm{Cov}\left[T^{ab}(y^{(i)}) \middle| \boldsymbol{\eta}\right] \eta^{b \prime} \right. \\
+  + \left. \delta_{ab} \eta^{a\prime\prime}\left( T^b (y^{(i)}) -
 	\textrm{E}\left[T^b(y^{(i)}) \middle| \boldsymbol{\eta} \right] \right) \right\}
-\end{equation}
+\end{multline}
 where \(\delta_{ab}\) is the Kronecker delta and there is no implicit
 summation over indices \(a, b\) in the term in the curly brackets.
 
@@ -664,11 +665,9 @@ one of them is highly relevant.
 \item \href{https://journal.r-project.org/archive/2011-2/RJournal_2011-2_Marschner.pdf}{Convergence problems in GLMs}
 \end{itemize}
 
-\section*{Appendix}
+\section{Case studies}
 
-\subsection*{Case studies}
-
-\subsubsection*{Linear (Gaussian)}
+\subsection{Linear (Gaussian)}
 
 The probability distribution function (PDF) of a normally-distributed variable
 with the standard parameterization is
@@ -942,10 +941,7 @@ principle to a GLM model.
 \item Normal-gamma
 \end{itemize}
 
-\subsection{TODO Summary of GLMs for exponential familes}
-
-A summary table would be useful listing the response distribution, natural
-parameters, partition function, canonical link function, variance function, etc.
-for each common case.
+\href{https://en.wikipedia.org/wiki/Exponential_family#Table_of_distributions}{Wikipedia}
+has a summary table with many properties of specific distributions.
 
 \end{document}
