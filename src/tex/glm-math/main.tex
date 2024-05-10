@@ -182,6 +182,23 @@ reminiscent of the inverse covariance matrix, at least in the multivariate
 normal distribution. The Hessian is manifestly symmetric so long as
 \(\mathbf{W}\) is.
 
+In practice for GLMs, individual weights for observations can be used but are
+not typically discussed as observation-dependent dispersions. Instead, the
+dispersion parameter is either fixed to one (logistic, exponential) or
+considered a free parameter (OLS, gamma). It does not affect the best
+parameters, but it does impact other quantities like variance or standardized
+residuals.
+
+When not fixed to 1, the dispersion parameter is estimated via the total deviance.
+\[\phi = \frac{D}{N - K} \]
+When variance weights\footnote{also known as analytic weights or reliability
+weights} $w_i$ are non-uniform, the unbiased estimator is
+\[\phi_{\mathbf{w}} = \frac{1}{\left(1 - \frac{K}{n_\mathrm{eff}}\right)} \frac{\Sigma_i w_i D_i}{\Sigma_i w_i} \]
+where \(n_\mathrm{eff} \equiv \frac{\left(\Sigma w\right)^2}{\Sigma w^2} \) is Kish's
+\emph{effective sample size}. The condition for this estimator to be defined
+changes from \(K < N\) in the unweighted case to \(K < n_\mathrm{eff}\) in the
+weighted case.
+
 \section{Comments on computing the link and variance functions}
 
 In the standard description the link function generally relates the expected
@@ -571,6 +588,14 @@ It can be shown\footnote{
 is, using a single-step approximation (for the unweighted, canonical case):
 \[\left(\mathbf{X}^\intercal \mathbf{S} \mathbf{X} \right) \Delta \bbeta^{(-i)} = \frac{\mathbf{x}^{(i)} e^{(i)}}{1 - h_{i}} \]
 where \(e^{(i)}\equiv y^{(i)} - \hat{y}^{(i)}\) are the response residuals.
+\footnote{
+  In the case of L1/L2 regularization, the Hessian is adjusted as normal and
+the expression becomes \( -\mathbf{H} \Delta\bbeta^{(-i)} =
+\frac{1}{1-h_i}\left(\mathbf{x}^{(i)}e^{(i)} - \lambda_1 \mathrm{sign}(\bbeta)
+\right)\). Perhaps a full ADMM iteration (without IRLS steps) would be required
+to solve this exactly. However, if a quadratic likelihood in \(\Delta \bbeta\)
+is considered, perhaps a modification of the exact OLS L1 adjustment can be
+applied.}
 The factor \(h_{i} \equiv P_{ii} \) is called the leverage of the
 ith observation, and is a measure of how strongly a given observation affects
 its corresponding prediction. The more general version of this expression has
