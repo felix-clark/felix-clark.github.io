@@ -399,7 +399,7 @@ regularization. This introduces additional variables to be updated in exchange
 for separating the non-smooth piece of the likelihood.
 
 \begin{align}
-\bbeta^{(k+1)} &= \textrm{argmin}_{\bbeta} \left( l(\bbeta) + \frac{\rho}{2}\left| \bbeta - \boldsymbol{\gamma}^{(k)} + \mathbf{u}^{(k)} \right|_2^2 \right) \\
+\bbeta^{(k+1)} &= \textrm{argmin}_{\bbeta} \left( -l(\bbeta) + \frac{\rho}{2}\left| \bbeta - \boldsymbol{\gamma}^{(k)} + \mathbf{u}^{(k)} \right|_2^2 \right) \\
 \boldsymbol{\gamma}^{(k+1)} &= \textrm{argmin}_{\boldsymbol{\gamma}} \left( \lambda_1 \left|\boldsymbol{\gamma}\right|_1 + \frac{\rho}{2}\left| \bbeta^{(k+1)} - \boldsymbol{\gamma} + \mathbf{u}^{(k)} \right|_2^2 \right) \\
 &= S_{\lambda_1 / \rho} \left( \bbeta^{(k+1)} + \mathbf{u}^{(k)} \right) \\
 \mathbf{u}^{(k+1)} &= \mathbf{u}^{(k)} + \bbeta^{(k+1)} - \boldsymbol{\gamma}^{(k+1)}
@@ -431,8 +431,9 @@ symmetry, so if this is a possibility then the elastic net is recommended.
 Further reading:
 \begin{itemize}
 \item \href{https://www.andrewng.org/publications/efficient-l1-regularized-logistic-regression/}{Efficient L1-regularized logistic regression}
-\item SO summary with useful links \href{https://math.stackexchange.com/a/3608432}{Efficient L1-regularized logistic regression}, in particular:
-\item \href{https://web.stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf}{... Statistical Learning via the ADMM (Section 6.3)}
+\item \href{https://math.stackexchange.com/a/3608432}{SO summary with useful links}, in particular:
+\item \href{https://web.stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf}{... Statistical Learning via the ADMM} in particular Section 6.3
+\item \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2929880/}{glmnet paper}
 \end{itemize}
 
 \subsection{Elastic net (L1 + L2 regularization)}
@@ -445,22 +446,6 @@ ADMM update by modifying the \(\gamma\) update slightly:
 
 This can be derived by adding \(\lambda_2|\gamma|_2^2\) to the function in
 the argmin over \(\boldsymbol{\gamma}\).
-
-\subsection{General effect on IRLS}
-
-For a general likelihood penalization
-\[ l_\Lambda = l_0 - \Lambda(\bbeta) \]
-the IRLS step for the canonical link function (but note that a non-canonical
-link function does not affect the regularization terms) is the following.
-\begin{equation}
-\left( \mathbf{X}^\intercal \mathbf{S} \mathbf{X} + \nabla \nabla^\intercal
-\Lambda \right) \bbeta' = \mathbf{X}^\intercal \left[ \mathbf{y} -
-g^{-1}(\mathbf{X}\bbeta) +
-\mathbf{S} \mathbf{X} \bbeta \right] - (\nabla
-\Lambda) + (\nabla \nabla^\intercal \Lambda) \bbeta
-\end{equation}
-Notice how the last two terms cancel for purely L2 regularization, but they must
-be considered in the general case.
 
 \subsection{TODO Effective degrees of freedom under regularization}
 
@@ -557,7 +542,9 @@ Equivalently, the components of the projection matrix are (for the canonical cas
 \[ P_{ij} = -S_{ii} \mathbf{x}^{(i)\intercal}\mathbf{H}^{-1}\mathbf{x}^{(j)} w_{j} \]
 where \(\mathbf{H}\) is the Hessian matrix of the likelihood.
 Note that this satisfies
-\(\mathbf{P}^2 = \mathbf{P}\) exactly so it is a projection matrix, and at
+\(\mathbf{P}^2 = \mathbf{P}\) exactly so it is a projection
+matrix\footnote{However, regularization seems to break this property as
+\(\mathbf{P}^2 = \mathbf{P} + \mathcal{O}(\lambda)\).}, and at
 the fit minimum it is orthogonal to the response residuals
 \(\mathbf{P}\cdot\left(\mathbf{y} - \hat{\mathbf{y}}\right) = 0\) as can be
 observed from the IRLS step equation and the convergence of the parameters such
@@ -572,16 +559,16 @@ exactly for OLS. However, for sufficiently small perturbations
 
 To the extent that \(\mathrm{Cov}[\hat{y}^{(i)}, y^{(i)}] = P_{ii}
 \mathrm{Var}[y^{(i)}] \) (exact for OLS and approximate/asymtotic otherwise),
-\[ \mathrm{Var}[e^{(i)}] = \mathrm{Var}[y^{(i)}] (1 - h_i) = \phi S_{ii} (1-h_i) \]
+\[ \mathrm{Var}[e^{(i)}] = \mathrm{Var}[y^{(i)}] (1 - h_i) = \frac{\phi S_{ii}}{w_i} (1-h_i) \]
 where \(\phi\) is the dispersion parameter (often fixed to 1). This motivates
 the definition of the studentized Pearson residuals, which are expected to have
 a mean of 0 and a variance of 1.
-\[ \tilde{r}^{(i)} \equiv \frac{e^{(i)}}{\sqrt{\phi S_{ii} (1 - h_i)}} \]
+\[ \tilde{r}^{(i)} \equiv \sqrt{\frac{w_i}{\phi S_{ii} (1 - h_i)}} e^{(i)}\]
 
 \subsection{Leave-one-out (LOO) corrections}
 
 It can be shown\footnote{
-    This derivation uses the linear algebra identity
+    This derivation uses the Sherman-Morrison formula
     \[ \left(\mathbf{A} + \mathbf{u}\mathbf{v}^\intercal\right)^{-1} = \mathbf{A}^{-1} - \frac{\left(\mathbf{A}^{-1}\mathbf{u}\right) \left(\mathbf{v}^\intercal \mathbf{A}^{-1} \right)}{1 + \mathbf{v}^\intercal\mathbf{A}^{-1}\mathbf{u}}\]
 } that the change in the parameters
 \(\bbeta^{(-i)}\) resulting from excluding an observation \(i\)
@@ -620,25 +607,34 @@ The effect on the total deviance is:
 \begin{align}
 D^{(-i)} &= -2 \left[ l^{(-i)} - l_\textrm{sat} \right] \\\
 &= D - 2 \Delta l^{(-i)} \\\
-&= D + \frac{h_i w_i}{(1-h_i)^2} r^{(i)2}
+&= D + \frac{h_i}{(1-h_i)^2} r^{(i)2}
 \end{align}
 
-where \( r^{(i)} \equiv e^{(i)} / \sqrt{S_{ii}} \) are the (non-studentized) Pearson residuals. For a single term, the change works out to
+where \( r^{(i)} \equiv \sqrt{\frac{w_i}{S_{ii}}}e^{(i)} \) are the (non-studentized) Pearson residuals. For a single term, the change works out to
 \[ D_i^{(-j)} - D_i = \frac{1}{(1-h_j)S_{ii}} \left( 2P_{ij} e^{(i)} e^{(j)} + \frac{P_{ij}^2}{1 - h_j} e^{(j)2} \right) \]
 which for the self-change (i.e. \( j = i\))
-\[ D_i^{(-i)} - D_i = \frac{h_i e^{(i)2}}{(1-h_i)S_{ii}} \left( 2  + \frac{h_i}{1 - h_i}\right) \]
+\[ D_i^{(-i)} - D_i = \frac{h_i r^{(i)2}}{1-h_i} \left( 2  + \frac{h_i}{1 - h_i}\right) \]
 
 \subsubsection{Dispersion parameter}
 
 When the dispersion parameter \(\phi\) is free, it is typically estimated via the deviance.
 \[ \phi = \frac{D}{N - K} \]
-When leaving one observation out, the estimation becomes\footnote{If frequency weights $f_j$ are used, the denominator becomes \(N - K - f_j\) where \(N = \Sigma_j f_j\).}
+When leaving one observation out, the estimation becomes
 \begin{align}
-  \phi^{(-i)} &= \frac{1}{N - K - 1} \left( \Sigma_{j\neq i} w_j D_{j}^{(-i)} \right) \\
-              &= \frac{1}{N - K - 1} \left( D^{(-i)} - w_i D_{i}^{(-i)} \right) \\
-              &= \frac{1}{N - K - 1} \left[ D - w_i D_i - w_i \frac{h_i}{1-h_i} r^{(i)2} \right]
+  \phi^{(-i)} &= \frac{1}{N - K - 1} \left( \Sigma_{j\neq i} D_{j}^{(-i)} \right) \\
+              &= \frac{1}{N - K - 1} \left( D^{(-i)} - D_{i}^{(-i)} \right) \\
+              &= \frac{1}{N - K - 1} \left[ D - D_i - \frac{h_i}{1-h_i} r^{(i)2} \right]
 \end{align}
 in terms of the Pearson results $r^{(i)}$.
+
+With variance weights, the denominator has a more complicated for to correct.
+Defining moments of the variance weights $v_1 = \Sigma_i w_i$ and $v_2 = \Sigma_i w_i^2$,
+\begin{align}
+  \phi^{(-i)} &= \frac{D - D_i - \frac{h_i}{1-h_i} r^{(i)2} }{v_1^{(-i)} - K \frac{v_2^{(-i)}}{v_1^{(-i)}}} \\
+              &= \frac{D - D_i - \frac{h_i}{1-h_i} r^{(i)2} }{v_1 - w_i - K \frac{v_2 - w_i^2}{v_1 - w_i}} \\
+\end{align}
+Note that both the deviance terms $D_i$ and the squared pearson residuals
+$r^{(i)2}$ include a factor of a variance weight $w_i$ in this formulation.
 
 \url{http://people.stat.sfu.ca/~raltman/stat402/402L25.pdf}
 
