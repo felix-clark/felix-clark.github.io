@@ -16,12 +16,12 @@
 \section{Introduction}
 
 A generalized linear model (GLM) describes the expected value of a response
-variable \(y\) with a link function \(g\) and a linear combination of \(K\) feature
-variables \(x_k\).
-\[ g(E[y]) \sim \beta_0 + \beta_1 x_1 + \ldots + \beta_K x_K \]
+variable \(y\) with a link function \(g\) and a linear combination of \(K-1\)
+feature variables \(x_k\) (for \(K\) parameters including the intercept term).
+\[ g(E[y]) \sim \beta_0 + \beta_1 x_1 + \ldots + \beta_{K-1} x_{K-1} \]
 The definition \(x_0 \equiv 1\) is used so that with \(\mathbf{x}^\intercal \equiv [1, x_1,
-	\ldots, x_K]\) and \(\bbeta^\intercal \equiv [\beta_0, \beta_1, \ldots
-	\beta_K]\) the above equation is written as the following.
+\ldots, x_{K-1}]\) and \(\bbeta^\intercal \equiv [\beta_0, \beta_1, \ldots
+\beta_{K-1}]\) the above equation is written as the following.
 \[ g(E[y]) = \mathbf{x}^\intercal \bbeta\]
 The \emph{linear predictor} is defined as \(\omega = \mathbf{x}^\intercal
 \bbeta \).
@@ -30,10 +30,10 @@ For \(N\) observations the response variables can be expressed as a vector
 \(\mathbf{y}^\intercal \equiv [y^{(1)}, \ldots, y^{(N)}]\) and the data matrix is
 \begin{equation}
 	\mathbf{X} \equiv \begin{pmatrix}
-		1      & x_1^{(1)} & \ldots & x_K^{(1)} \\
-		1      & x_1^{(2)} & \ldots & x_K^{(2)} \\
+    1      & x_1^{(1)} & \ldots & x_{K-1}^{(1)} \\
+    1      & x_1^{(2)} & \ldots & x_{K-1}^{(2)} \\
 		\vdots & \vdots    & \ddots & \vdots    \\
-		1      & x_1^{(N)} & \ldots & x_K^{(N)}
+    1      & x_1^{(N)} & \ldots & x_{K-1}^{(N)}
 	\end{pmatrix}
 \end{equation}
 so that the matrix components are \(X_{ik} = x_{k}^{(i)}\).
@@ -189,8 +189,9 @@ considered a free parameter (OLS, gamma). It does not affect the best
 parameters, but it does impact other quantities like variance or standardized
 residuals.
 
-When not fixed to 1, the dispersion parameter is estimated via the total deviance.
+When not fixed to 1, the dispersion parameter is estimated via the total deviance:
 \[\phi = \frac{D}{N - K} \]
+where \(K\) is the number of free parameters in the model.
 When variance weights\footnote{also known as analytic weights or reliability
 weights} $w_i$ are non-uniform, the unbiased estimator is
 \[\phi_{\mathbf{w}} = \frac{1}{\left(1 - \frac{K}{n_\mathrm{eff}}\right)} \frac{\Sigma_i w_i D_i}{\Sigma_i w_i} \]
@@ -702,7 +703,7 @@ or equivalently:
 The common approach is to use a natural description that uses only the linear
 term in \(y\), taking the dispersion parameter \(\phi = \sigma^2\) so that
 \(\eta = \mu\), \(A(\eta) = \frac{\eta^2}{2}\), and \(B(y, \phi) =
--\frac{y^2}{2\phi} - \log(2\pi\phi) \).\footnote{
+-\frac{y^2}{2\phi} - \frac{1}{2}\log(2\pi\phi) \).\footnote{
     Exercise: Check that the mean and variance of \(y\) are \(\mu\) and
     \(\sigma^2\), respectively, by taking first and second derivatives of
     \(A(\eta)\) while making sure to include the dispersion parameter factor
@@ -915,8 +916,8 @@ by\footnote{
 
 Assuming that a reasonable choice of \(r\) can be selected, the natural
 parameter is \(\eta = \log(1-p)\), the log-partition function is \(A(\eta)
-= - r \log(1 - e^\eta)\), the mean is \(\mu = \frac{rp}{1-p}\), the canonical
-link function is \(g(\mu) = \log \frac{r}{r+\mu}\).
+= - r \log(1 - e^\eta)\), the mean is \(\mu = \frac{r(1-p)}{p}\), the canonical
+link function is \(g(\mu) = \log \frac{\mu}{r+\mu}\).
 With the obvious dispersion parameter \(\phi = 1\) the variance function is
 \(V(\mu) = \mu \left( 1 + \frac{\mu}{r} \right)\).
 Since \(0 < p < 1\), a non-canonical link function might be useful, such as
