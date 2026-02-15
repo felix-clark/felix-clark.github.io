@@ -932,7 +932,7 @@ Gaussian-distributed parameter.
 Rather it is the distribution of the time it takes for a Gaussian process to
 drift to a certain level.
 \begin{align}
-f(y; \mu, \lambda) &= \sqrt{\frac{\lambda}{2\pi x^3}}
+f(y; \mu, \lambda) &= \sqrt{\frac{\lambda}{2\pi y^3}}
 e^{-\frac{\lambda(y-\mu)^2}{2\mu^2 y}} \\\
 \log f(y; \mu, \lambda) &= -\frac{\lambda(y - \mu)^2}{2\mu^2 y} + \frac{1}{2}
 \log \frac{\lambda}{2\pi y^3} \\\
@@ -942,7 +942,7 @@ e^{-\frac{\lambda(y-\mu)^2}{2\mu^2 y}} \\\
 The sufficient statistics are therefore \(\mathbf{T}(y)^\intercal = [y, 1/y]\)
 with corresponding natural parameters \(\boldsymbol{\eta}^\intercal =
 [-\lambda/2\mu^2, -\lambda/2]\), and the log-partition function is
-\(A(\boldsymbol{\eta}) = 2\sqrt{\eta_1 \eta_2} - \frac{1}{2} \log (-2\eta_2) \).
+\(A(\boldsymbol{\eta}) = - 2\sqrt{\eta_1 \eta_2} - \frac{1}{2} \log (-2\eta_2) \).
 The expected values of these statistics are \(\textrm{E}[\mathbf{T}^\intercal(y); \mu,
 \lambda] = [\mu, 1/\mu + 1/\lambda] \) or \(\textrm{E}[\mathbf{T}^\intercal
 (y); \boldsymbol{\eta}] = \left[\sqrt{\frac{\eta_2}{\eta_1}},
