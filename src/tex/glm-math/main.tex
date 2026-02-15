@@ -357,7 +357,7 @@ Note that the Hessian is negative-definite, so adding the regularization term
 does not risk making it degenerate. In fact, it can help condition for small
 eigenvalues of the Hessian.
 
-Another way of denoting the above is with a Tikhonov matrix
+Another way of denoting the above is with a Tikhonov matrix \\
 \(\boldsymbol{\Gamma} = \textrm{diag}(0, \sqrt{\lambda_2}, \ldots,
 \sqrt{\lambda_2})\) which penalizes the likelihood by
 \(\left|\boldsymbol{\Gamma}\bbeta\right|^2/2\). This makes the
@@ -389,8 +389,8 @@ This corresponds to a prior Laplace distribution for each parameter with width
 contrast to ridge regression which mostly makes large coefficients smaller.
 
 There is difficulty in naively adjusting the Hessian and Jacobian using IRLS
-because the likelihood is non-differentiable and the Hessian becomes infinite
-when \(\beta_k = 0\) for any \(k \geq 1\).
+because the likelihood is non-differentiable when \(\beta_k = 0\) for any \(k
+\geq 1\).
 
 In the simplest case of OLS with orthogonal covariates (i.e. \(\mathbf{X}^\intercal \mathbf{X} = \mathbf{I}\)) then the magnitude of each parameter is reduced by \(\lambda_1\); if the absolute value is already less than \(\lambda_1\) then it is set to zero.
 \[\beta_k \rightarrow S_{\lambda_1}\left(\beta_k\right) \equiv \textrm{sgn}(\beta_k) \, \textrm{max}\left(0, |\beta_k| - \lambda_1 \right)\]
@@ -479,7 +479,8 @@ can be interpreted as a generalization of that quantity.
 
 We also consider the contribution from a single observation
 \[D_i = -2\left[ l(y^{(i)}|\mathbf{x}^{(i)}, \bbeta) - l_{\textrm{sat}}(y^{(i)}) \right]\]
-so that \(D = \Sigma_i w_i D_i\).
+so that \(D = \Sigma_i w_i D_i\) where in these expressions $D_i$ is the
+unweighted component of the deviance for observation \(i\).
 
 The \emph{deviance residuals} are a useful measurement of the discrepancy
 between the response data and the model's predictions, that aren't sensitive to
@@ -542,14 +543,13 @@ matrices with elements as defined above.
 Equivalently, the components of the projection matrix are (for the canonical case)
 \[ P_{ij} = -S_{ii} \mathbf{x}^{(i)\intercal}\mathbf{H}^{-1}\mathbf{x}^{(j)} w_{j} \]
 where \(\mathbf{H}\) is the Hessian matrix of the likelihood.
-Note that this satisfies
+Note that at the fit minimum, this satisfies
 \(\mathbf{P}^2 = \mathbf{P}\) exactly so it is a projection
 matrix\footnote{However, regularization seems to break this property as
-\(\mathbf{P}^2 = \mathbf{P} + \mathcal{O}(\lambda)\).}, and at
-the fit minimum it is orthogonal to the response residuals
-\(\mathbf{P}\cdot\left(\mathbf{y} - \hat{\mathbf{y}}\right) = 0\) as can be
-observed from the IRLS step equation and the convergence of the parameters such
-that \(\Delta \bbeta = 0\).
+\(\mathbf{P}^2 = \mathbf{P} + \mathcal{O}(\lambda)\).} and is orthogonal to the
+response residuals \(\mathbf{P}\cdot\left(\mathbf{y} - \hat{\mathbf{y}}\right)
+= 0\) as can be observed from the IRLS step equation and the convergence of the
+parameters such that \(\Delta \bbeta = 0\).
 
 \subsection{Pearson residuals}
 
