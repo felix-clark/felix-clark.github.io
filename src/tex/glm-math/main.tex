@@ -653,6 +653,17 @@ removing the effect of each data point on the fit itself when computing the
 deviance residuals.
 \[\tilde{t}_i = \mathrm{sign}(e^{(i)}) \sqrt{\frac{D_i^{(-i)}}{\phi^{(-i)}}} \]
 
+\subsubsection{Cook's distance}
+The Cook's distance is another measurement of how much the fit is impacted by
+each observation. For GLM's, it's defined as
+\begin{align}
+  C_i &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)^\intercal \mathrm{Cov}[\boldsymbol{\beta}]^{-1} \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)}{K \phi} \\
+      &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)^\intercal \left(\mathbf{X}^\intercal \mathbf{W} \mathbf{S} \mathbf{X}\right) \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)}{K \phi} \\
+      &= \frac{h_i}{(1-h_i)^2} \frac{r^{(i)2}}{K\phi}
+\end{align}
+where \(r^{(i)} = \sqrt{\frac{w_i}{S_{ii}}}e^{(i)}\) are the standardized (but not studentized)
+Pearson residuals.
+
 \section{TODO Goodness of fit}
 
 \begin{itemize}
