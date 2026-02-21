@@ -133,7 +133,8 @@ variance matrix is diagonal with \(S_{ii} = \textrm{Var}[y^{(i)}|\eta]\). Even
 when a non-canonical link function is used, the term with the 2nd derivative of
 \(\eta\) is often dropped, as it can lead to numerical issues if the Hessian is
 negative. There is a more robust justification for this involving e.g. Fisher
-information and expectations, but and a reference here would be good to add.
+information and expectations (TODO: find decent reference for this if not
+explain it).
 
 \section{Dispersion parameter}
 
@@ -142,7 +143,7 @@ so-called dispersion is parameterized by the variable \(\phi\).
 \[ \log f(y; \boldsymbol{\theta}, \phi) = \frac{\boldsymbol{\eta}(\boldsymbol{\theta})
 		\cdot \mathbf{T}(y) - A(\boldsymbol{\theta})}{\phi} + B(y, \phi) \]
 One useful feature of this formalism is that the dispersion parameter can
-sometimes absorb on of the parameters of a multi-parameter distribution, such as
+sometimes absorb one of the parameters of a multi-parameter distribution, such as
 the variance in a normal distribution, allowing the regression to be agnostic of
 the absorbed parameter.
 
@@ -657,11 +658,32 @@ deviance residuals.
 The Cook's distance is another measurement of how much the fit is impacted by
 each observation. For GLM's, it's defined as
 \begin{align}
-  C_i &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)^\intercal \mathrm{Cov}[\boldsymbol{\beta}]^{-1} \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)}{K \phi} \\
-      &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)^\intercal \left(\mathbf{X}^\intercal \mathbf{W} \mathbf{S} \mathbf{X}\right) \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(i)}\right)}{K \phi} \\
+  C_i &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(-i)}\right)^\intercal \mathrm{Cov}[\boldsymbol{\beta}]^{-1} \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(-i)}\right)}{K \phi} \\
+      &= \frac{\left(\boldsymbol{\beta} - \boldsymbol{\beta}^{(-i)}\right)^\intercal \left(\mathbf{X}^\intercal \mathbf{W} \mathbf{S} \mathbf{X}\right) \left( \boldsymbol{\beta} - \boldsymbol{\beta}^{(-i)}\right)}{K \phi} \\
       &= \frac{h_i}{(1-h_i)^2} \frac{r^{(i)2}}{K\phi}
 \end{align}
 where \(r^{(i)} = \sqrt{\frac{w_i}{S_{ii}}}e^{(i)}\) are the Pearson residuals.
+
+\section{Parameter scaling}
+
+Often one wants to standardize the training data so that the features all have
+zero mean and unit variance. This separates the contribution from the mean
+values and puts all coefficients on the same footing. In general with weights
+$w_i$ we have:
+
+\begin{align}
+  x'_k &= \frac{x_k - \mu_k}{\sigma_k} \\
+  \mu_k &= \frac{\sum_k w_k x_k}{\sum_k w_k} \\
+  \sigma_k &= \sqrt{\frac{\sum_k w_k (x_k - \mu_k)^2}{\sum_k w_k - \frac{\sum_k w_k^2}{\sum_k w_k}}}
+\end{align}
+and we can take by convention $\sigma_i = 1$ for zero-variance data columns. We
+must have \(\beta'_0 + \sum_k \beta'_k x'_k = \beta_0 + \sum_k \beta_k x_k\), so
+\begin{align}
+  \beta_0 &= \beta'_0 - \sum_k \frac{\beta'_k \mu_k}{\sigma_k} \\
+  \beta_k &= \frac{\beta'_k}{\sigma_k} \\
+  \beta'_0 &= \beta_0 + \sum_k \beta_k \mu_k \\
+  \beta'_k &= \beta'_k \sigma_k \\
+\end{align}
 
 \section{TODO Goodness of fit}
 
