@@ -679,11 +679,35 @@ $w_i$ we have:
 and we can take by convention $\sigma_i = 1$ for zero-variance data columns. We
 must have \(\beta'_0 + \sum_k \beta'_k x'_k = \beta_0 + \sum_k \beta_k x_k\), so
 \begin{align}
-  \beta_0 &= \beta'_0 - \sum_k \frac{\beta'_k \mu_k}{\sigma_k} \\
+  \beta_0 &= \beta'_0 - \sum_{k=1} \frac{\beta'_k \mu_k}{\sigma_k} \\
   \beta_k &= \frac{\beta'_k}{\sigma_k} \\
-  \beta'_0 &= \beta_0 + \sum_k \beta_k \mu_k \\
+  \beta'_0 &= \beta_0 + \sum_{k=1} \beta_k \mu_k \\
   \beta'_k &= \beta'_k \sigma_k \\
 \end{align}
+
+The Jacobian of the transformation $\beta \rightarrow \beta'$ is given by the matrix
+\begin{equation}
+  \boldsymbol{\mathcal{J}}_{ij} = \frac{\partial \beta'_i}{\partial \beta_j} = \begin{pmatrix}
+    1      & \mu_1 & \mu_2 & \ldots & \mu_{K-2} & \mu_{K-1} \\
+    0      & \sigma_1 & 0 & \ldots & 0 & 0\\
+    0      & 0 & \sigma_2 & \ldots & 0 & 0 \\
+    \vdots  & \vdots & \vdots   & \ddots & \vdots & \vdots   \\
+    0      & 0 & 0 & \ldots & \sigma_{K-2} & 0 \\
+    0      & 0 & 0 & \ldots & 0 & \sigma_{K-1} \end{pmatrix}
+\end{equation}
+
+which means the Fisher information matrix is
+\begin{equation}
+  \boldsymbol{\mathcal{I}} = \boldsymbol{\mathcal{J}}^\intercal \boldsymbol{\mathcal{I}}'\boldsymbol{\mathcal{J}}
+\end{equation}
+where \(\boldsymbol{\mathcal{I}}'\) is the Fisher information matrix in terms
+of the standardized parameters $\beta'$, more easily extracted from the fit
+result.
+
+Note that in a no-intercept context, data and parameters can still be scaled by
+the standard deviation, but they cannot be also shifted and maintain this
+property. Variable scaling can still be appled, but $\mu_k$ are effectively set
+to zero (after using them to compute $\sigma_k$, that is).
 
 \section{TODO Goodness of fit}
 
