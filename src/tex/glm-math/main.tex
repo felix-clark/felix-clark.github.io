@@ -700,14 +700,66 @@ which means the Fisher information matrix is
 \begin{equation}
   \boldsymbol{\mathcal{I}} = \boldsymbol{\mathcal{J}}^\intercal \boldsymbol{\mathcal{I}}'\boldsymbol{\mathcal{J}}
 \end{equation}
-where \(\boldsymbol{\mathcal{I}}'\) is the Fisher information matrix in terms
-of the standardized parameters $\beta'$, more easily extracted from the fit
-result.
+where \(\boldsymbol{\mathcal{I}}'\) is the observed Fisher information matrix
+(the negative Hessian at the fit minimum) in terms of the standardized
+parameters $\beta'$, more easily extracted from the fit result.
 
 Note that in a no-intercept context, data and parameters can still be scaled by
 the standard deviation, but they cannot be also shifted and maintain this
 property. Variable scaling can still be appled, but $\mu_k$ are effectively set
 to zero (after using them to compute $\sigma_k$, that is).
+
+\section{Covariance of coefficient estimates}
+
+Without regularization, the covariance of the $\boldsymbol{\beta}$ is
+straighforwardly the observed Fisher information matrix, which is the Hessian
+at the fit minimum.
+\[\textrm{Cov}[\beta_i , \beta_j] = \mathcal{I}_{ij} = -H_{ij} \]
+
+It gets tricker when including regularization terms. If the regularization
+penalty was taken as implying a true prior distribution for
+$\boldsymbol{\beta}$, using the penalized Hessian (e.g. \(\mathbf{H} =
+-\mathbf{X}^\intercal \mathbf{WSX} - \lambda_2 \mathbf{I} \)) might still be
+justified, but this is rarely the case in practical applications.
+
+We'll proceed to outline the argument for a more robust estimator, but not with
+full rigor. For reference, see
+\href{https://repository.lib.ncsu.edu/server/api/core/bitstreams/40ad2126-511c-49e8-b15f-a02683725978/content}{\emph{The
+calculus of M-estimation} by Stefanski and Boos (2001)}.
+
+Consider an estimate $\hat{\boldsymbol{\beta}}$ around a "true" value
+$\boldsymbol{\beta}_0$. Asymtotically ($n \rightarrow \infty$) we should have
+\(\hat{\boldsymbol \beta} \rightarrow \boldsymbol \beta_0\). The score function
+\(\mathbf{J} = \nabla_\beta l\) is zero at the optimized fit. Taylor expand
+ 
+\begin{align}
+  0 &= \mathbf{J}(\boldsymbol\beta_0) + \mathbf{H}(\boldsymbol\beta_0)
+  (\hat{\boldsymbol\beta} - \boldsymbol\beta_0) +
+  \mathcal{O}\left((\hat{\boldsymbol\beta} - \boldsymbol\beta_0)^2 \right) \\
+  \hat{\boldsymbol\beta} - \boldsymbol\beta_0 &\sim -\mathbf{H}^{-1}(\boldsymbol\beta_0) \mathbf{J}(\boldsymbol\beta_0)
+  % \label{eq:}
+\end{align}
+and note that part of the rigor we are neglecting is showing that the
+higher-order terms can be dropped.
+
+Since $\mathbf{H}$ has no explicit dependence on $y_i$, it can essentially be
+represented by its observed value (under the asymptotic assumption). The score
+vector \(\mathbf{J}\) has an expectation value of zero. By the central limit
+theorem, it is asymptotically normal, so we must only derive its covariance.
+Take $\mathbf{J}_0$ as the unregularized score, so \(\mathbf{J} = \mathbf{J}_0
+- \nabla \Lambda(\boldsymbol\beta_0)\), which is useful because the
+regularization component is not random, so \( \textrm{Cov}[\mathbf{J}] =
+\textrm{Cov}[\mathbf{J_0}]\). But the covariance of $\mathbf{J}_0$ is given by
+the covariance of $y$, up to the data and weight matrix factors. Thus 
+\(\textrm{Cov}[\mathbf{J}_0] = \mathbf{X^\intercal WSX} = -\mathbf{H}_0\),
+where the other weight matrix factor probably goes into the weighted average
+over the $(y-g^{-1})^2$ terms.
+
+Now using Slutsky's theorem, since the regularized $\mathbf{H}$ act like a
+constant scale, we can say asymptotically that \(\hat{\boldsymbol\beta} -
+\boldsymbol\beta_0\) is normally-distributed with mean zero and covariance
+\(\mathbf{H}^{-1} \mathbf{H}_0 \mathbf{H}^{-1}\).
+
 
 \section{TODO Goodness of fit}
 
