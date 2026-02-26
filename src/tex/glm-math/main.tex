@@ -797,7 +797,9 @@ one of them is highly relevant.
 
 \section{Case studies}
 
-\subsection{Linear (Gaussian)}
+\subsection{Gaussian}
+
+\subsubsection{Linear regression}
 
 The probability distribution function (PDF) of a normally-distributed variable
 with the standard parameterization is
@@ -837,19 +839,63 @@ analytically,
 although if the estimated parameters are far from zero an additional IRLS step
 may be useful for improved numerical accuracy.
 
+\subsubsection{Variable variance}
+
 An alternative application is to include both \(y\) and \(y^2\) in the
 sufficient statistics \(\mathbf{T}^\intercal(y) = [y, y^2]\). This leads to
 natural parameters \(\boldsymbol{\eta}^\intercal = \left[ \frac{\mu}{\sigma^2},
 -\frac{1}{2\sigma^2} \right] \) with a trivial dispersion parameter \(\phi =
-1\). Up to a constant the log-partition function is \(A(\eta_1, \eta_2) =
--\frac{\eta_1^2}{4\eta_2} - \frac{1}{2}\log (-\eta_2) \). This is likely a good
-application for a non-canonical link function for \(\eta_2\), for instance
-\(\eta_2 = - \exp(\mathbf{x}\cdot\bbeta_2)\), since \(\sigma^2 >
-0\) so \(\eta_2 < 0\). Here the variance function \(V(\mu)\) could possibly
-be replaced by a covariance function of the two-component expected values of
-\(\mu\) and \(\sigma^2\), but checking this should require some more careful
-analysis. 
+1\). The reverse transformation is \(\mu = -\eta_1/2\eta_2\) and \(\sigma^2 =
+-1/2\eta_2\). Up to a constant the log-partition function is \(A(\eta_1,
+\eta_2) = -\frac{\eta_1^2}{4\eta_2} - \frac{1}{2}\log (-\eta_2) \).
+This is likely a good application for a non-canonical link function for
+\(\eta_2\), for instance \(\eta_2 = - \exp(\mathbf{x}\cdot\bbeta_2)\), since
+\(\sigma^2 > 0\) so \(\eta_2 < 0\). Here the variance function \(V(\mu)\) could
+possibly be replaced by a covariance function of the two-component expected
+values of \(\mu\) and \(\sigma^2\), but checking this should require some more
+careful analysis. 
 
+The log-likelihood and its gradients in terms of the natural parameters is
+\begin{align}
+  \ell = \log f(y; \eta_1, \eta_2) &= \eta_2 y^2 + \eta_1 y + \frac{\eta_1^2}{4\eta_2} + \frac{1}{2} \log (-2\eta_2) + B \\
+  \frac{\partial \ell}{\partial \eta_1} &= y + \frac{\eta_1}{2\eta_2} \\
+  \frac{\partial \ell}{\partial \eta_2} &= y^2 - \frac{\eta_1^2}{4\eta_2^2} + \frac{1}{2\eta_2}
+  % \label{eq:}
+\end{align}
+so there is already some mixing at this level regardless of the link functions
+chosen. The 2nd derivatives won't reduce in complexity.
+
+I wonder if this natural parameter approach is leading us astray. Maybe it's
+better to consider the mean \(\mu\) and a reparameterization of the variance
+\(\sigma^2 = e^{-\nu}\). This approach would generalize nicely because it just
+slots into the dispersion parameter for any family. Try \(\mu =
+\mathbf{x}\cdot\boldsymbol\beta\) and \(\nu =
+\mathbf{x}\cdot\boldsymbol\gamma\).
+
+\begin{align}
+  \ell &= \sum_i -\frac{1}{2} (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} - \frac{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma}{2} \\
+  \mathbf{J}_\beta &= \sum_i \mathbf{x}^{(i)}(y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta) e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
+  \mathbf{J}_\gamma &= \sum_i -\frac{1}{2}\mathbf{x}^{(i)}\left[ (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} +1 \right] \\
+  \mathbf{H}_{\beta\beta} &= \sum_i -\mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal} e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
+  \mathbf{H}_{\beta\gamma} &= \sum_i \mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal}(y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta) e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
+  \mathbf{H}_{\gamma\gamma} &= \sum_i -\frac{1}{2}\mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal}  (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
+  % \label{eq:}
+\end{align}
+An IRLS step could be defined in block-matrix form
+
+\begin{equation}
+  \begin{pmatrix} 
+    \mathbf{H}_{\beta\beta} & \mathbf{H}_{\beta\gamma} \\ 
+    \mathbf{H}_{\beta\gamma} & \mathbf{H}_{\gamma\gamma} \\ 
+  \end{pmatrix} \begin{pmatrix}
+  \Delta \boldsymbol\beta \\
+  \Delta \boldsymbol\gamma \\
+    \end{pmatrix} = - \begin{pmatrix}
+  \mathbf{J}_\beta \\
+  \mathbf{J}_\gamma
+  \end{pmatrix}
+  % \label{eq:}
+\end{equation}
 
 \subsection{Logistic (Bernoulli)}
 
