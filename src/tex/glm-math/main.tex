@@ -932,19 +932,18 @@ is \(V(\mu) = \mu\).
 
 \subsection{Exponential}
 
-While exponentially-distributed error terms are not common, this distribution is
-still a useful case study because the distribution itself is mathematically
-simple but the constraint on the distribution's parameter motivates a
-non-canonical link function.
-The PDF for an exponentially-distributed positive real value \(y\) is
+The exponential response distribution has a simple form but the constraint on
+the distribution's parameter motivates a non-canonical link function. The PDF
+for an exponentially-distributed positive real value \(y\) is
 \[ f(y; \lambda) = \begin{cases}
 \lambda e^{-\lambda y} & \textrm{for } y \geq 0 \\\
 0 & \textrm{for } y < 0
 \end{cases}\]
 with \(\lambda > 0\) and the log-PDF is
 \[ \log f(y; \lambda) = -\lambda y + \log \lambda \]
-where \(y \geq 0\). The natural parameter is \(\eta = -\lambda\) and the
-log-partition function is \(A(\eta) = - \log(-\eta)\).
+where \(y \geq 0\) (and an implied \(-\infty\) for \(y < 0\)). The natural
+parameter is \(\eta = -\lambda\) and the log-partition function is \(A(\eta) =
+- \log(-\eta)\).
 Since the mean of the distribution is \(\mu = -\frac{1}{\eta} =
 \frac{1}{\lambda}\), the canonical link function is the negative inverse
 \(g_0(\mu) = -\frac{1}{\mu}\).
@@ -1038,7 +1037,8 @@ The variance could thus be written as either\footnote{
 \frac{1}{\beta}\mu = \frac{1}{\alpha}\mu^2\) with dispersion factor \(\phi\)
 being the reciprocal of either \(\beta\) or \(\alpha\), respectively.
 It turns out that the second choice, with \(\phi = \frac{1}{\alpha}\) and
-\(V(\mu) = \mu^2\), is the most straightforward.
+\(V(\mu) = \mu^2\), is the most straightforward and directly generalizes the
+exponential GLM by maintaining its variance function.
 \[ \log f(y; \mu, \phi) = \frac{-\frac{1}{\mu} y - \log \mu}{\phi} + B(y, \phi)
 \]
 In fact, other than the \(B(y, \phi)\) term this looks just like the case of
