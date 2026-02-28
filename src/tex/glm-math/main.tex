@@ -1092,7 +1092,8 @@ e^{-\frac{\lambda(y-\mu)^2}{2\mu^2 y}} \\\
 \log f(y; \mu, \lambda) &= -\frac{\lambda(y - \mu)^2}{2\mu^2 y} + \frac{1}{2}
 \log \frac{\lambda}{2\pi y^3} \\\
 &= -\frac{\lambda}{2\mu^2} y - \frac{\lambda}{2} \frac{1}{y} +
-\frac{\lambda}{\mu} + \frac{1}{2}\log \lambda + B(y)
+\frac{\lambda}{\mu} + \frac{1}{2}\log \lambda + B(y) \\
+&= \frac{-y/\mu^2 - 1/y + 1/\mu}{2/\lambda} + \frac{1}{2}\log\lambda + B(y)
 \end{align}
 The sufficient statistics are therefore \(\mathbf{T}(y)^\intercal = [y, 1/y]\)
 with corresponding natural parameters \(\boldsymbol{\eta}^\intercal =
@@ -1102,6 +1103,10 @@ The expected values of these statistics are \(\textrm{E}[\mathbf{T}^\intercal(y)
 \lambda] = [\mu, 1/\mu + 1/\lambda] \) or \(\textrm{E}[\mathbf{T}^\intercal
 (y); \boldsymbol{\eta}] = \left[\sqrt{\frac{\eta_2}{\eta_1}},
 \sqrt{\frac{\eta_1}{\eta_2}} - \frac{1}{2\eta_2}\right]\).
+
+To put in dispersed form, note that we can take \(\phi = 2/\lambda\) and then
+\(\eta = -1/\mu^2\). So this is another situation where the canonical link
+function doesn't disallow impossible values.
 
 
 \subsection{Others}
