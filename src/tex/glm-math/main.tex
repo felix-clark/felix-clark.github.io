@@ -873,9 +873,9 @@ slots into the dispersion parameter for any family. Try \(\mu =
 \mathbf{x}\cdot\boldsymbol\gamma\).
 
 \begin{align}
-  \ell &= \sum_i -\frac{1}{2} (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} - \frac{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma}{2} \\
+  \ell &= \sum_i -\frac{1}{2} (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} + \frac{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma}{2} \\
   \mathbf{J}_\beta &= \sum_i \mathbf{x}^{(i)}(y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta) e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
-  \mathbf{J}_\gamma &= \sum_i -\frac{1}{2}\mathbf{x}^{(i)}\left[ (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} +1 \right] \\
+  \mathbf{J}_\gamma &= \sum_i -\frac{1}{2}\mathbf{x}^{(i)}\left[ (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} - 1 \right] \\
   \mathbf{H}_{\beta\beta} &= \sum_i -\mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal} e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
   \mathbf{H}_{\beta\gamma} &= \sum_i \mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal}(y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta) e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
   \mathbf{H}_{\gamma\gamma} &= \sum_i -\frac{1}{2}\mathbf{x}^{(i)}\mathbf{x}^{(i)\intercal}  (y^{(i)} - \mathbf{x}^{(i)}\cdot\boldsymbol\beta)^2 e^{\mathbf{x}^{(i)}\cdot\boldsymbol\gamma} \\
@@ -896,6 +896,15 @@ An IRLS step could be defined in block-matrix form
   \end{pmatrix}
   % \label{eq:}
 \end{equation}
+
+Note that \(\mathbf{H}_{\beta\gamma} = \mathbf{J}_\beta \mathbf{x}^\intercal
+\), which vanishes at the fit optimum. This fortunately means that
+the \(\boldsymbol\beta\) and \(\boldsymbol\gamma\) results are independent (at
+least once the fit converges). This suggests that an alternating algorithm that
+stepped \(\beta\) and \(\gamma\) separately (ignoring
+\(\mathbf{H}_{\beta\gamma}\)) would also converge. It appears that this would
+be true for other families as well, at least with the exponential
+parameterization of the dispersion.
 
 \subsection{Logistic (Bernoulli)}
 
